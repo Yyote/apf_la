@@ -1042,7 +1042,7 @@ int main(int argc, char **argv)
 
     if (enable_attraction == 1)
     {
-        goal_sub = nh.subscribe("/move_base_simple/goal", 1000, got_goal_cb);
+        goal_sub = nh.subscribe("/point_stacker/actual_goal", 1000, got_goal_cb);
     }
     
     odom_sub = nh.subscribe("/odom", 1000, got_odom_cb); //  HOOK odom usage

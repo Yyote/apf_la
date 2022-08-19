@@ -57,6 +57,7 @@ add_message_files(
   FILES
   VelocitiesScan.msg
   VelocitiesPC.msg
+  GlobalTrajectory.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -249,6 +250,10 @@ add_dependencies(tf2_laser_bind_to_odom apf_la_generate_messages_cpp)
 add_executable(odom_to_PoseStamped src/odom_to_PoseStamped.cpp)
 target_link_libraries(odom_to_PoseStamped ${catkin_LIBRARIES})
 add_dependencies(odom_to_PoseStamped apf_la_generate_messages_cpp)
+
+add_executable(astar_point_stacker src/astar_point_stacker.cpp)
+target_link_libraries(astar_point_stacker ${catkin_LIBRARIES})
+add_dependencies(astar_point_stacker apf_la_generate_messages_cpp)
 
 catkin_install_python(
 PROGRAMS
