@@ -1,0 +1,99 @@
+<mxfile host="65bd71144e">
+    <diagram id="wKKiUWEgryos_iY61zEp" name="Page-1">
+        <mxGraphModel dx="408" dy="807" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="16" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=classic;endFill=1;startArrow=classic;startFill=1;" parent="1" source="2" target="15" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="Отталкивание" style="swimlane;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="50" width="200" height="260" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="Мультипликатор &lt;b&gt;&lt;font color=&quot;#007fff&quot;&gt;double&lt;/font&gt;&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" parent="2" vertex="1">
+                    <mxGeometry x="10" y="30" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="Максимальное расстояние обработки&amp;nbsp;&lt;b&gt;&lt;font color=&quot;#007fff&quot;&gt;double&lt;/font&gt;&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" parent="2" vertex="1">
+                    <mxGeometry x="10" y="60" width="180" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="Минимальное расстояние обработки&amp;nbsp;&lt;b&gt;&lt;font color=&quot;#007fff&quot;&gt;double&lt;/font&gt;&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" parent="2" vertex="1">
+                    <mxGeometry x="10" y="100" width="180" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="RVIZ Стрелочка отталкивания &lt;font color=&quot;#007fff&quot;&gt;&lt;b&gt;bool&lt;/b&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" parent="2" vertex="1">
+                    <mxGeometry x="10" y="140" width="180" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="RVIZ Облако обрабатываемых точек&amp;nbsp;&lt;b style=&quot;color: rgb(0 , 127 , 255)&quot;&gt;bool&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" parent="2" vertex="1">
+                    <mxGeometry x="10" y="180" width="180" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="RVIZ Круг обработки&amp;nbsp;&lt;b style=&quot;color: rgb(0 , 127 , 255)&quot;&gt;bool&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" parent="2" vertex="1">
+                    <mxGeometry x="10" y="220" width="180" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" style="edgeStyle=none;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="4" target="15" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="500" y="190" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="4" value="Притягивание" style="swimlane;" parent="1" vertex="1">
+                    <mxGeometry x="530" y="87.5" width="200" height="185" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="Мультипликатор&amp;nbsp;&lt;b&gt;&lt;font color=&quot;#007fff&quot;&gt;double&lt;/font&gt;&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" vertex="1" parent="4">
+                    <mxGeometry x="10" y="30" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="Макс. вектор&amp;nbsp;&lt;b&gt;&lt;font color=&quot;#007fff&quot;&gt;double&lt;/font&gt;&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" vertex="1" parent="4">
+                    <mxGeometry x="10" y="60" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="Мин. вектор &lt;font color=&quot;#ff0000&quot;&gt;(не сущ. в коде)&lt;/font&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="4">
+                    <mxGeometry x="10" y="155" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="RVIZ целевая точка&amp;nbsp;&lt;b style=&quot;color: rgb(0 , 127 , 255)&quot;&gt;bool&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" vertex="1" parent="4">
+                    <mxGeometry x="10" y="125" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="49" value="RVIZ вектор притягивания&amp;nbsp;&lt;b style=&quot;color: rgb(0 , 127 , 255)&quot;&gt;bool&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" vertex="1" parent="4">
+                    <mxGeometry x="10" y="95" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" style="edgeStyle=none;html=1;entryX=0.15;entryY=0.95;entryDx=0;entryDy=0;startArrow=classic;startFill=1;entryPerimeter=0;" parent="1" source="6" target="15" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="Регулятор" style="swimlane;" parent="1" vertex="1">
+                    <mxGeometry x="170" y="360" width="200" height="320" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="Bключить притягивание?&amp;nbsp;&lt;b style=&quot;color: rgb(0 , 127 , 255)&quot;&gt;bool&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" vertex="1" parent="6">
+                    <mxGeometry x="10" y="30" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="Режим регулятора &lt;font color=&quot;#007fff&quot;&gt;&lt;b&gt;int&lt;/b&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" vertex="1" parent="6">
+                    <mxGeometry x="10" y="60" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="36" value="Угол соотношения х и итогового вектора (1)&amp;nbsp;&lt;b&gt;&lt;font color=&quot;#007fff&quot;&gt;double&lt;/font&gt;&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" vertex="1" parent="6">
+                    <mxGeometry x="10" y="270" width="180" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" value="Максимальная линейная скорость&amp;nbsp;&lt;b&gt;&lt;font color=&quot;#007fff&quot;&gt;double&lt;/font&gt;&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" vertex="1" parent="6">
+                    <mxGeometry x="10" y="90" width="180" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" value="Кэффициент линейной скорости (3)&amp;nbsp;&lt;b&gt;&lt;font color=&quot;#007fff&quot;&gt;double&lt;/font&gt;&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#FF0000;" vertex="1" parent="6">
+                    <mxGeometry x="10" y="170" width="180" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="48" value="Кэффициент угловой скорости (3)&amp;nbsp;&lt;b&gt;&lt;font color=&quot;#007fff&quot;&gt;double&lt;/font&gt;&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#FF0000;" vertex="1" parent="6">
+                    <mxGeometry x="10" y="220" width="180" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="58" value="Максимальная угловая&amp;nbsp;скорость&amp;nbsp;&lt;b&gt;&lt;font color=&quot;#007fff&quot;&gt;double&lt;/font&gt;&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeColor=#007FFF;" vertex="1" parent="6">
+                    <mxGeometry x="10" y="130" width="180" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="Сервер Динамической Реконфигурации&lt;br&gt;(СДР)" style="shape=datastore;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="350" y="120" width="100" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="51" value="Стэк точек (не сущ. в коде)" style="swimlane;fontStyle=1;fontColor=#FF0000;" vertex="1" parent="1">
+                    <mxGeometry x="530" y="310" width="200" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="50" value="Расстояние выполнения цели&amp;nbsp;&lt;font color=&quot;#ff0000&quot;&gt;(не сущ. в коде)&lt;/font&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="51">
+                    <mxGeometry x="10" y="40" width="180" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="57" style="edgeStyle=none;html=1;entryX=0.85;entryY=0.95;entryDx=0;entryDy=0;startArrow=classic;startFill=1;entryPerimeter=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="51" target="15">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="350" y="370" as="sourcePoint"/>
+                        <mxPoint x="410" y="250" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

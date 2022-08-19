@@ -1,0 +1,49 @@
+!!python/object/new:dynamic_reconfigure.encoding.Config
+dictitems:
+  RVIZ_attraction_arrow: true
+  RVIZ_calculated_points_cloud: true
+  RVIZ_goal: true
+  RVIZ_repulsion_arrow: true
+  RVIZ_visibility_circle: true
+  angular_speed_multiplier: 11.0
+  attraction_multiplier: 0.2
+  enable_attraction: true
+  groups: !!python/object/new:dynamic_reconfigure.encoding.Config
+    dictitems:
+      RVIZ_attraction_arrow: true
+      RVIZ_calculated_points_cloud: true
+      RVIZ_goal: true
+      RVIZ_repulsion_arrow: true
+      RVIZ_visibility_circle: true
+      angular_speed_multiplier: 11.0
+      attraction_multiplier: 0.2
+      enable_attraction: true
+      groups: !!python/object/new:dynamic_reconfigure.encoding.Config
+        state: []
+      id: 0
+      linear_speed_multiplier: 0.7
+      max_angle_to_accept_movement: 0.1
+      max_angular_speed: 1.47
+      max_calculation_distance: 1.5
+      max_linear_speed: 0.4
+      max_vector: 10.0
+      min_calculation_distance: 0.1
+      name: Default
+      parameters: !!python/object/new:dynamic_reconfigure.encoding.Config
+        state: []
+      parent: 0
+      regulator_mode: 3
+      repulsion_multiplier: 0.003
+      state: true
+      type: ''
+    state: []
+  linear_speed_multiplier: 0.7
+  max_angle_to_accept_movement: 0.1
+  max_angular_speed: 1.47
+  max_calculation_distance: 1.5
+  max_linear_speed: 0.4
+  max_vector: 10.0
+  min_calculation_distance: 0.1
+  regulator_mode: 3
+  repulsion_multiplier: 0.003
+state: []
