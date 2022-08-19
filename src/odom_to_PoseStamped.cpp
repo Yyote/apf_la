@@ -4,7 +4,7 @@
 
 ros::Publisher pose_pub;
 
-void odom_callback(nav_msgs::Odometry::ConstPtr& odom)
+void odom_callback(const nav_msgs::Odometry::ConstPtr& odom)
 {
     geometry_msgs::PoseStamped pose;
     pose.header.frame_id = "odom";
@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "odom_to_PoseStamped_node");
     
     ros::NodeHandle n;
-    pose_pub = n.advertise<geometry_msgs::PoseStamped>(/"chatter", 1000);
+    pose_pub = n.advertise<geometry_msgs::PoseStamped>("/mavros/local_position/pose", 1000);
     ros::Subscriber odom_sub = n.subscribe("/odom", 1000, odom_callback);
     
     ros::spin();
