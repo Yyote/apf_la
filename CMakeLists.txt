@@ -57,7 +57,6 @@ add_message_files(
   FILES
   VelocitiesScan.msg
   VelocitiesPC.msg
-  GlobalTrajectory.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -231,9 +230,9 @@ include_directories(
 
 # NODES
 
-add_executable(LidarFormattingRPLidar src/LidarFormattingRPLidar.cpp)
-target_link_libraries(LidarFormattingRPLidar ${catkin_LIBRARIES})
-add_dependencies(LidarFormattingRPLidar apf_la_generate_messages_cpp)
+# add_executable(LidarFormattingRPLidar src/LidarFormattingRPLidar.cpp)
+# target_link_libraries(LidarFormattingRPLidar ${catkin_LIBRARIES})
+# add_dependencies(LidarFormattingRPLidar apf_la_generate_messages_cpp)
 
 add_executable(LStoPC src/LStoPC.cpp)
 target_link_libraries(LStoPC ${catkin_LIBRARIES})
@@ -247,19 +246,6 @@ add_executable(tf2_laser_bind_to_odom src/tf2_laser_bind_to_odom.cpp)
 target_link_libraries(tf2_laser_bind_to_odom ${catkin_LIBRARIES})
 add_dependencies(tf2_laser_bind_to_odom apf_la_generate_messages_cpp)
 
-add_executable(odom_to_PoseStamped src/odom_to_PoseStamped.cpp)
-target_link_libraries(odom_to_PoseStamped ${catkin_LIBRARIES})
-add_dependencies(odom_to_PoseStamped apf_la_generate_messages_cpp)
-
-add_executable(astar_point_stacker src/astar_point_stacker.cpp)
-target_link_libraries(astar_point_stacker ${catkin_LIBRARIES})
-add_dependencies(astar_point_stacker apf_la_generate_messages_cpp)
-
-catkin_install_python(
-PROGRAMS
-scripts/astar.py
-DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
 
 
 

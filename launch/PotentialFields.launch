@@ -2,13 +2,12 @@
 <launch>
   <node name="LidarFormattingRPLidar" pkg="apf_la" type="LidarFormattingRPLidar" output="screen"/>
   <node name="LStoPC" pkg="apf_la" type="LStoPC" output="screen"/>
-  <node name="Potential_fields" pkg="apf_la" type="potential_fields" output="screen" />
+  <node name="Potential_fields" pkg="apf_la" type="potential_fields" output="screen"/>
   <!-- <node name="Potential_fields" pkg="apf_la" type="oop" output="screen"/> -->
   <node name="TF2_broadcast_laser_to_odom" pkg="apf_la" type="tf2_laser_bind_to_odom" output="screen"/>
   <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" output="screen"/>
-  <node name="odom_to_pose_node" pkg="apf_la" type="odom_to_PoseStamped" output="screen"/>
-  <node name="astar_point_stacker_node" pkg="apf_la" type="astar_point_stacker" output="screen"/>
 </launch>
+
 
 
 

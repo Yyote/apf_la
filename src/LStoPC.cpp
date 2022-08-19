@@ -41,8 +41,8 @@ int main(int argc, char **argv)
   
   ros::NodeHandle n;
 
-  Laser_sub = n.subscribe("limited_scan", 100, chatterCallback);
-  cloud_pub = n.advertise<sensor_msgs::PointCloud>("transPC", 100);
+  Laser_sub = n.subscribe("/scan", 100, chatterCallback);
+  cloud_pub = n.advertise<sensor_msgs::PointCloud>("/transPC", 100);
 
 
 
