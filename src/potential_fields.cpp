@@ -28,12 +28,11 @@
 
 
 // PRESETUP
-bool enable_turn_vectors_to_global = 1;
-bool enable_attraction = 1;
+bool enable_turn_vectors_to_global = 0;
 nav_msgs::Odometry global_odom;
 
 ros::Subscriber goal_sub;
-ros::Subscriber odom_sub; // HOOK odom usage
+ros::Subscriber odom_sub; 
 
 // SUB catchPC creation
 ros::Subscriber catchPC_sub;
@@ -282,6 +281,13 @@ class EulerAngles {
         tf2::Matrix3x3 m(q);
         m.getRPY(roll, pitch, yaw);
     }
+
+    void normalise_angles()
+    {
+        roll = roll * (roll >= 0) + (roll + 2 * M_PI) * (roll < 0);
+        pitch = pitch * (pitch >= 0) + (pitch + 2 * M_PI) * (pitch < 0);
+        yaw = yaw * (yaw >= 0) + (yaw + 2 * M_PI) * (yaw < 0);
+    }
 };
 
 // Потенциальные поля отталкивания от видимых точек на лазерскане
@@ -485,12 +491,12 @@ if(0)
     << "_________________________________" << std::endl << "_________________________________" << std::endl);
 }
 
-        // Если включено, вектор поворачивается в глобальную систему координат для визуализации и только. Передача финального вектора в глобальную систему идет в РЕГУЛЯТОРЕ
-        if(enable_turn_vectors_to_global)
-        {
-            finvec_x = finvec_x * cos(-angles.yaw) - finvec_y * sin(-angles.yaw);
-            finvec_y = finvec_x * sin(-angles.yaw) + finvec_y * cos(-angles.yaw);
-        }
+        // // Если включено, вектор поворачивается в глобальную систему координат для визуализации и только. Передача финального вектора в глобальную систему идет в РЕГУЛЯТОРЕ
+        // if(enable_turn_vectors_to_global)
+        // {
+        //     finvec_x = finvec_x * cos(-angles.yaw) - finvec_y * sin(-angles.yaw);
+        //     finvec_y = finvec_x * sin(-angles.yaw) + finvec_y * cos(-angles.yaw);
+        // }
 
         //* - * - * - * - * - * - * - * - * - * - * - */ - */ - * - * - * - * - *
         //* - * - * - * - * - * -     RVIZ      - * - */ - */ - * - * - * - * - *  //RVIZ 
@@ -533,193 +539,200 @@ if(0)
         //* - * - * - * - * - * - * - * - * - * - * - */ - */ - * - * - * - * - *
         //* - * - * - * - * - * - * - * - * - * - * - */ - */ - * - * - * - * - *
 
-        // Если включено, вектор поворачивается в обратно в локальную систему координат. Передача финального вектора в глобальную систему идет в РЕГУЛЯТОРЕ
-        if(enable_turn_vectors_to_global)
-        {
-            finvec_x = finvec_x * cos(angles.yaw) - finvec_y * sin(angles.yaw);
-            finvec_y = finvec_x * sin(angles.yaw) + finvec_y * cos(angles.yaw);
-        }
+        // // Если включено, вектор поворачивается в обратно в локальную систему координат. Передача финального вектора в глобальную систему идет в РЕГУЛЯТОРЕ
+        // if(enable_turn_vectors_to_global)
+        // {
+        //     finvec_x = finvec_x * cos(angles.yaw) - finvec_y * sin(angles.yaw);
+        //     finvec_y = finvec_x * sin(angles.yaw) + finvec_y * cos(angles.yaw);
+        // }
     }
 };
 
 // Потенциальные поля притяжения к целевой точке
-class   PotentialFieldAttractive
-{
-    private:
-    EulerAngles angles;
-    double vector_length;
-    double tmpvec_x = 0;
-    double tmpvec_y = 0;
 
-    public:
-    double MULTIPLICATOR;
-    double goal_x /*= 0*/; // Полученная координата х
-    double goal_y /*= 0*/; // Полученная у
-    double finvec_x; // Рассчитанная точка
-    double finvec_y; // Рассчитанная точка
-    MarkerHandler final_attraction_arrow;
-    MarkerHandler goal;
+// class   PotentialFieldAttractive
+// {
+//     private:
+//     EulerAngles angles;
+//     double vector_length;
+//     double tmpvec_x = 0;
+//     double tmpvec_y = 0;
 
-    float MAX_VECTOR;
-    bool PUBLISH_FINAL_ATTRACTION_ARROW;
-    bool PUBLISH_GOAL;
-    // IDEA min_vector, goal_accomplished_range;
+//     public:
+//     double MULTIPLICATOR;
+//     double goal_x /*= 0*/; // Полученная координата х
+//     double goal_y /*= 0*/; // Полученная у
+//     double finvec_x; // Рассчитанная точка
+//     double finvec_y; // Рассчитанная точка
+//     MarkerHandler final_attraction_arrow;
+//     MarkerHandler goal;
 
-    PotentialFieldAttractive()
-    {
-        MULTIPLICATOR = 0.2;   
-        MAX_VECTOR = 0.3;
+//     float MAX_VECTOR;
+//     bool PUBLISH_FINAL_ATTRACTION_ARROW;
+//     bool PUBLISH_GOAL;
+//     // IDEA min_vector, goal_accomplished_range;
 
-        goal_x = NULL;
-        goal_y = NULL;
-        finvec_x = 0;
-        finvec_y = 0;
+//     PotentialFieldAttractive()
+//     {
+//         MULTIPLICATOR = 0.2;   
+//         MAX_VECTOR = 0.3;
+
+//         goal_x = NULL;
+//         goal_y = NULL;
+//         finvec_x = 0;
+//         finvec_y = 0;
         
-        PUBLISH_FINAL_ATTRACTION_ARROW = 1;
-        PUBLISH_GOAL = 1;
+//         PUBLISH_FINAL_ATTRACTION_ARROW = 1;
+//         PUBLISH_GOAL = 1;
         
-        final_attraction_arrow._init(nh_pointer, "/potential_field_attraction_marker");
-        goal._init(nh_pointer, "/goal_marker");
-    }
+//         final_attraction_arrow._init(nh_pointer, "/potential_field_attraction_marker");
+//         goal._init(nh_pointer, "/goal_marker");
+//     }
 
-    void calculate_attract_vector()
-    {
-        finvec_y = 0;
-        finvec_x = 0;
+//     void calculate_attract_vector()
+//     {
+//         finvec_y = 0;
+//         finvec_x = 0;
 
-        if(goal_x != NULL && goal_y != NULL)
-        {
-            tmpvec_x = goal_x - global_odom.pose.pose.position.x;
-            tmpvec_y = goal_y - global_odom.pose.pose.position.y;
-        }
+//         if(goal_x != NULL && goal_y != NULL)
+//         {
+//             tmpvec_x = goal_x - global_odom.pose.pose.position.x;
+//             tmpvec_y = goal_y - global_odom.pose.pose.position.y;
+//         }
 
-        // tf2::Quaternion q(odom.pose.pose.orientation.x, odom.pose.pose.orientation.y, odom.pose.pose.orientation.z, odom.pose.pose.orientation.w); // HOOK odom usage
+//         // tf2::Quaternion q(odom.pose.pose.orientation.x, odom.pose.pose.orientation.y, odom.pose.pose.orientation.z, odom.pose.pose.orientation.w); 
 
-        vector_length = sqrt((tmpvec_x * tmpvec_x) + (tmpvec_y * tmpvec_y));
+//         vector_length = sqrt((tmpvec_x * tmpvec_x) + (tmpvec_y * tmpvec_y));
 
-        finvec_y = MULTIPLICATOR * ((vector_length) * (tmpvec_y / vector_length))/* - (MAX_RANGE / sqrt(2))*/; // BUG check atan limits and adjust the formula
-        finvec_x = MULTIPLICATOR * ((vector_length) * (tmpvec_x / vector_length))/* - (MAX_RANGE / sqrt(2))*/; // SOLVED change the formula for the pithagorean
+//         finvec_y = MULTIPLICATOR * ((vector_length) * (tmpvec_y / vector_length))/* - (MAX_RANGE / sqrt(2))*/; // BUG check atan limits and adjust the formula
+//         finvec_x = MULTIPLICATOR * ((vector_length) * (tmpvec_x / vector_length))/* - (MAX_RANGE / sqrt(2))*/; // SOLVED change the formula for the pithagorean
 
-        tmpvec_x = finvec_x;
-        tmpvec_y = finvec_y;
+//         tmpvec_x = finvec_x;
+//         tmpvec_y = finvec_y;
 
-        tf2::Quaternion qodom;
-        tf2::fromMsg(global_odom.pose.pose.orientation, qodom);
-        angles.get_RPY_from_quaternion(qodom);
-        // tf2::Matrix3x3 m(qodom);
-        // m.getRPY(angles.roll, angles.pitch, angles.yaw);
+//         tf2::Quaternion qodom;
+//         tf2::fromMsg(global_odom.pose.pose.orientation, qodom);
+//         angles.get_RPY_from_quaternion(qodom);
+//         // tf2::Matrix3x3 m(qodom);
+//         // m.getRPY(angles.roll, angles.pitch, angles.yaw);
 
-        angles.yaw = -angles.yaw;
+//         angles.yaw = -angles.yaw;
 
-        finvec_x = tmpvec_x * cos(angles.yaw) - tmpvec_y * sin(angles.yaw);
-        finvec_y = tmpvec_x * sin(angles.yaw) + tmpvec_y * cos(angles.yaw);
+//         finvec_x = tmpvec_x * cos(angles.yaw) - tmpvec_y * sin(angles.yaw);
+//         finvec_y = tmpvec_x * sin(angles.yaw) + tmpvec_y * cos(angles.yaw);
 
-        if (finvec_x > MAX_VECTOR || finvec_x < - MAX_VECTOR)
-        {
-            double tmp;
-            tmp = finvec_x;
-            finvec_x = MAX_VECTOR * (finvec_x > MAX_VECTOR) - MAX_VECTOR * (finvec_x < MAX_VECTOR);
-            tmp = finvec_x / tmp;
-            finvec_y = finvec_y * tmp;
-        }
-
-
-        if (finvec_y > MAX_VECTOR || finvec_y < - MAX_VECTOR)
-        {
-            double tmp;
-            tmp = finvec_y;
-            finvec_y = MAX_VECTOR * (finvec_y > MAX_VECTOR) - MAX_VECTOR * (finvec_y < MAX_VECTOR);
-            tmp = finvec_y / tmp;
-            finvec_x = finvec_x * tmp;
-        }
+//         if (finvec_x > MAX_VECTOR || finvec_x < - MAX_VECTOR)
+//         {
+//             double tmp;
+//             tmp = finvec_x;
+//             finvec_x = MAX_VECTOR * (finvec_x > MAX_VECTOR) - MAX_VECTOR * (finvec_x < MAX_VECTOR);
+//             tmp = finvec_x / tmp;
+//             finvec_y = finvec_y * tmp;
+//         }
 
 
-        // // angles.yaw = (atan(finvec_y / finvec_x)/* - (M_PI) * (finvec_x > 0)*/); //BUG no vector inversion
-        // // // angles.yaw = (angles.yaw + 2 * M_PI) * (angles.yaw < - M_PI) + (angles.yaw) * (!(angles.yaw < - M_PI));
-        // // angles.yaw = M_PI;
+//         if (finvec_y > MAX_VECTOR || finvec_y < - MAX_VECTOR)
+//         {
+//             double tmp;
+//             tmp = finvec_y;
+//             finvec_y = MAX_VECTOR * (finvec_y > MAX_VECTOR) - MAX_VECTOR * (finvec_y < MAX_VECTOR);
+//             tmp = finvec_y / tmp;
+//             finvec_x = finvec_x * tmp;
+//         }
 
 
-//DEBUG rinfo finvec of attraction
-//****************************************************************************************************
-if(0)
-{
-    ROS_INFO_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
-    << "FUNCTION NAME: finvec of attraction" << std::endl 
-    << "VARIABLES: " << std::endl 
-    << "finvec_x -->" << finvec_x << std::endl 
-    << "finvec_y -->" << finvec_y << std::endl 
-    << "_________________________________" << std::endl << "_________________________________" << std::endl);
-}
-//****************************************************************************************************
+//         // // angles.yaw = (atan(finvec_y / finvec_x)/* - (M_PI) * (finvec_x > 0)*/); //BUG no vector inversion
+//         // // // angles.yaw = (angles.yaw + 2 * M_PI) * (angles.yaw < - M_PI) + (angles.yaw) * (!(angles.yaw < - M_PI));
+//         // // angles.yaw = M_PI;
 
-ROS_WARN_STREAM(std::endl << "angle is" << angles.yaw << std::endl);
 
-        //*-*-*-*-*-*-*-*--*-*-*-*-*--*--*-*-*-*-*-*-*--*--*-*-*-*-*-*-*-*-*-*-*--*-*-*-*
-        //------------------------------------------------------------------------------
-        // VISUALIZATION //RVIZ visualiztion code // TODO make it a func
-        //------------------------------------------------------------------------------
+// //DEBUG rinfo finvec of attraction
+// //****************************************************************************************************
+// if(0)
+// {
+//     ROS_INFO_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
+//     << "FUNCTION NAME: finvec of attraction" << std::endl 
+//     << "VARIABLES: " << std::endl 
+//     << "finvec_x -->" << finvec_x << std::endl 
+//     << "finvec_y -->" << finvec_y << std::endl 
+//     << "_________________________________" << std::endl << "_________________________________" << std::endl);
+// }
+// //****************************************************************************************************
 
-        angles.yaw = atan(finvec_y / finvec_x) - M_PI * (finvec_x < 0);
+// ROS_WARN_STREAM(std::endl << "angle is" << angles.yaw << std::endl);
 
-        // Если включено, вектор поворачивается в глобальную систему координат для визуализации и только. Передача финального вектора в глобальную систему идет в РЕГУЛЯТОРЕ
-        if(enable_turn_vectors_to_global)
-        {
-            finvec_x = finvec_x * cos(-angles.yaw) - finvec_y * sin(-angles.yaw);
-            finvec_y = finvec_x * sin(-angles.yaw) + finvec_y * cos(-angles.yaw);
-        }
+//         //*-*-*-*-*-*-*-*--*-*-*-*-*--*--*-*-*-*-*-*-*--*--*-*-*-*-*-*-*-*-*-*-*--*-*-*-*
+//         //------------------------------------------------------------------------------
+//         // VISUALIZATION //RVIZ visualiztion code // TODO make it a func
+//         //------------------------------------------------------------------------------
 
-        tf2::Quaternion q;
-        angles.setRPY_of_quaternion(q);
-        // q.setRPY(0, 0, 0);
-        q.normalize();
+//         angles.yaw = atan(finvec_y / finvec_x) - M_PI * (finvec_x < 0);
 
-        final_attraction_arrow.set_frame("laser"); //FRAME
-        final_attraction_arrow.set_namespace("speeds_namespace2");
-        final_attraction_arrow.set_id(34);
-        final_attraction_arrow.set_type(0);
-        // final_attraction_arrow.set_type(2);
-        // final_attraction_arrow.set_pose(odom.pose.pose.position.x, odom.pose.pose.position.y, odom.pose.pose.position.z, q);
-        final_attraction_arrow.set_pose(0, 0, 0, q);
-        final_attraction_arrow.set_scale(sqrt(pow(finvec_x, 2) + pow(finvec_y, 2)), 0.02, 0.02);
-        // final_attraction_arrow.set_scale(0.2, 0.2, 0.2);
-        final_attraction_arrow.set_color(1.0, 1.0, 1.0, 0.0);
-        // final_attraction_arrow.debug_info("Arrow");
+//         // Если включено, вектор поворачивается в глобальную систему координат для визуализации и только. Передача финального вектора в глобальную систему идет в РЕГУЛЯТОРЕ
+//         if(enable_turn_vectors_to_global)
+//         {
+//             finvec_x = finvec_x * cos(-angles.yaw) - finvec_y * sin(-angles.yaw);
+//             finvec_y = finvec_x * sin(-angles.yaw) + finvec_y * cos(-angles.yaw);
+//         } // HOOK enable_turn_vectors_to_global
 
-        if(PUBLISH_FINAL_ATTRACTION_ARROW == 1)
-        {
-            final_attraction_arrow.publish_marker(); // PUBLISHER //RVIZ publish
-        }
+//         tf2::Quaternion q;
+//         angles.setRPY_of_quaternion(q);
+//         // q.setRPY(0, 0, 0);
+//         q.normalize();
 
-        tf2::Quaternion q1;
+//         final_attraction_arrow.set_frame("laser"); //FRAME
+//         final_attraction_arrow.set_namespace("speeds_namespace2");
+//         final_attraction_arrow.set_id(34);
+//         final_attraction_arrow.set_type(0);
+//         // final_attraction_arrow.set_type(2);
+//         // final_attraction_arrow.set_pose(odom.pose.pose.position.x, odom.pose.pose.position.y, odom.pose.pose.position.z, q);
+//         final_attraction_arrow.set_pose(0, 0, 0, q);
+//         final_attraction_arrow.set_scale(sqrt(pow(finvec_x, 2) + pow(finvec_y, 2)), 0.02, 0.02);
+//         // final_attraction_arrow.set_scale(0.2, 0.2, 0.2);
+//         final_attraction_arrow.set_color(1.0, 1.0, 1.0, 0.0);
+//         // final_attraction_arrow.debug_info("Arrow");
 
-        //IDEA make a bullshit filter for potential fields and create max passed speed constant
-        // q1.setRPY(angles.roll, angles.pitch, angles.yaw - (M_PI) * (finvec_x > 0));
-        q1.setRPY(0, 0, 0);
-        q1 = q1.normalize(); //SOLVED something is going with angle. cant say what, maybe its not a bug ---> in velocity calculation there was an if statement that tried to pass only > 0.001 coordiantes. It totally deleted all negative values from coordinates
+//         if(PUBLISH_FINAL_ATTRACTION_ARROW == 1)
+//         {
+//             final_attraction_arrow.publish_marker(); // PUBLISHER //RVIZ publish
+//         }
 
-        goal.set_frame("odom"); //FRAME
-        goal.set_namespace("speeds_namespace");
-        goal.set_id(76);
-        goal.set_type(2);
-        goal.set_pose(goal_x, goal_y, 0, q1);
-        goal.set_scale(0.05, 0.05, 0.05);
-        goal.set_color(1.0, 1.0, 0.0, 0.0);
-        // goal.debug_info("Goal");
+//         tf2::Quaternion q1;
 
-        if(PUBLISH_GOAL == 1)
-        {
-            goal.publish_marker(); // PUBLISHER //RVIZ publish
-        }
-        //*-*-*-*-*-*-*-*--*-*-*-*-*--*--*-*-*-*-*-*-*--*--*-*-*-*-*-*-*-*-*-*-*--*-*-*-*
+//         //IDEA make a bullshit filter for potential fields and create max passed speed constant
+//         // q1.setRPY(angles.roll, angles.pitch, angles.yaw - (M_PI) * (finvec_x > 0));
+//         q1.setRPY(0, 0, 0);
+//         q1 = q1.normalize(); //SOLVED something is going with angle. cant say what, maybe its not a bug ---> in velocity calculation there was an if statement that tried to pass only > 0.001 coordiantes. It totally deleted all negative values from coordinates
 
-        // Если включено, вектор поворачивается обратно в локальную систему координат. Передача финального вектора в глобальную систему идет в РЕГУЛЯТОРЕ
-        if(enable_turn_vectors_to_global)
-        {
-            finvec_x = finvec_x * cos(angles.yaw) - finvec_y * sin(angles.yaw);
-            finvec_y = finvec_x * sin(angles.yaw) + finvec_y * cos(angles.yaw);
-        }
-    }
-};
+//         goal.set_frame("odom"); //FRAME
+//         goal.set_namespace("speeds_namespace");
+//         goal.set_id(76);
+//         goal.set_type(2);
+//         goal.set_pose(goal_x, goal_y, 0, q1);
+//         goal.set_scale(0.05, 0.05, 0.05);
+//         goal.set_color(1.0, 1.0, 0.0, 0.0);
+//         // goal.debug_info("Goal");
+
+//         if(PUBLISH_GOAL == 1)
+//         {
+//             goal.publish_marker(); // PUBLISHER //RVIZ publish
+//         }
+//         //*-*-*-*-*-*-*-*--*-*-*-*-*--*--*-*-*-*-*-*-*--*--*-*-*-*-*-*-*-*-*-*-*--*-*-*-*
+
+//         // Если включено, вектор поворачивается обратно в локальную систему координат. Передача финального вектора в глобальную систему идет в РЕГУЛЯТОРЕ
+//         if(enable_turn_vectors_to_global)
+//         {
+//             finvec_x = finvec_x * cos(angles.yaw) - finvec_y * sin(angles.yaw);
+//             finvec_y = finvec_x * sin(angles.yaw) + finvec_y * cos(angles.yaw);
+//         } // HOOK enable_turn_vectors_to_global
+        
+//         if (enable_attraction == 0)
+//         {
+//             finvec_x = 0;
+//             finvec_y = 0;
+//         }
+//     }
+// };
 
 // Регулятор скоростей. Принимает вектора из потенциальных полей, суммирует их и возвращает скорость
 class SpeedRegulator2D
@@ -736,8 +749,6 @@ class SpeedRegulator2D
     double MAX_ANGULAR_SPEED;
     double MAX_ANGLE_TO_ACCEPT_MOVEMENT;
     int REGULATOR_MODE; //1 - wheeled bot safe, 2 - quadrocopter, 3 - y is turning by yaw
-    int repulsion_ready;
-    int attraction_ready;
     int PUBLISH_TOTAL_ARROW;
 
     SpeedRegulator2D()
@@ -750,8 +761,7 @@ class SpeedRegulator2D
 
         x_regulated = 0;
         y_regulated = 0;
-        repulsion_ready = 0;
-        attraction_ready = 0;
+
 
         total_arrow._init(nh_pointer, "/total_potential_fields_arrow");
         // total_arrow.advertise_to_topic("/final_PF_arrow");
@@ -778,10 +788,7 @@ class SpeedRegulator2D
     {
         x_regulated += x;
         y_regulated += y;
-        if (repulsion_ready == 1 && attraction_ready == 1 || REGULATOR_MODE == 2 && repulsion_ready == 1)
-        {
-            regulate();
-        }
+        regulate();
     }
 
     void set_sum_two_vectors_to_regulate_OVERRIDE(double &x1, double &y1, double &x2, double &y2)
@@ -804,10 +811,6 @@ class SpeedRegulator2D
 
     void regulate()
     {
-        EulerAngles angles;
-        angles.yaw = (atan(y_regulated / x_regulated) - (M_PI) * (x_regulated < 0)); //BUG no vector inversion
-        angles.yaw = (angles.yaw + 2 * M_PI) * (angles.yaw < - M_PI) + (angles.yaw) * (!(angles.yaw < - M_PI));
-
         EulerAngles odom_orientation;
         tf2::Quaternion qodom;
         qodom.setX(global_odom.pose.pose.orientation.x);
@@ -816,39 +819,54 @@ class SpeedRegulator2D
         qodom.setW(global_odom.pose.pose.orientation.w);
         odom_orientation.get_RPY_from_quaternion(qodom);
 
-//DEBUG rinfo
-//****************************************************************************************************
-if(1)
-{
-    ROS_WARN_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
-    << "FUNCTION NAME: check attraction vector on regulation" << std::endl 
-    << "VARIABLES: "<< std::endl 
-    << "x -->" << x_regulated << std::endl 
-    << "y -->" << y_regulated << std::endl 
-    << "yaw -->" << angles.yaw << std::endl 
-    << "_________________________________" << std::endl << "_________________________________" << std::endl);
-}
-//****************************************************************************************************
+ROS_INFO_STREAM("\n#############################################################\n#############################################################\n########	odom q " << 	global_odom.pose.pose.orientation.x << " " << global_odom.pose.pose.orientation.y << " " << global_odom.pose.pose.orientation.z << " "	<< global_odom.pose.pose.orientation.w << 		"\n########	odom RPY: " << 	odom_orientation.roll * 180 / M_PI << " " << odom_orientation.pitch * 180 / M_PI << " " << odom_orientation.yaw * 180 / M_PI	<< 		"\n#############################################################\n#############################################################");
+
+// //DEBUG rinfo
+// //****************************************************************************************************
+// if(1)
+// {
+//     ROS_WARN_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
+//     << "FUNCTION NAME: check attraction vector on regulation" << std::endl 
+//     << "VARIABLES: "<< std::endl 
+//     << "x -->" << x_regulated << std::endl 
+//     << "y -->" << y_regulated << std::endl 
+//     << "yaw -->" << angles.yaw << std::endl 
+//     << "_________________________________" << std::endl << "_________________________________" << std::endl);
+// }
+// //****************************************************************************************************
+
+        EulerAngles angles;
+        angles.yaw = (atan(y_regulated / x_regulated)/* - (M_PI) * (x_regulated < 0)*/); //BUG no vector inversion
+        angles.yaw = (angles.yaw + 2 * M_PI) * (angles.yaw < - M_PI) + (angles.yaw) * (!(angles.yaw < - M_PI));
+
+        // angles.normalise_angles();
+        ROS_INFO_STREAM("\n#############################################################\n#############################################################\n########	angles yaw:" << 	angles.yaw * 180 / M_PI	<< 		"\n########	reg:" << 	x_regulated << " " << y_regulated	<< 		"\n#############################################################\n#############################################################");
 
         if(enable_turn_vectors_to_global)
         {
+            // odom_orientation.yaw = -odom_orientation.yaw;
             x_regulated = x_regulated * cos(-odom_orientation.yaw) - y_regulated * sin(-odom_orientation.yaw);
             y_regulated = x_regulated * sin(-odom_orientation.yaw) + y_regulated * cos(-odom_orientation.yaw);
+            // odom_orientation.yaw = -odom_orientation.yaw;
+            angles.yaw = (atan(y_regulated / x_regulated)/* - (M_PI) * (x_regulated < 0)*/); //BUG no vector inversion
+            angles.yaw = (angles.yaw + 2 * M_PI) * (angles.yaw < - M_PI) + (angles.yaw) * (!(angles.yaw < - M_PI));
         }
 
-//DEBUG rinfo
-//****************************************************************************************************
-if(1)
-{
-    ROS_INFO_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
-    << "FUNCTION NAME: check attraction vector on regulation" << std::endl 
-    << "VARIABLES: "<< std::endl 
-    << "x -->" << x_regulated << std::endl 
-    << "y -->" << y_regulated << std::endl 
-    << "yaw -->" << angles.yaw << std::endl 
-    << "_________________________________" << std::endl << "_________________________________" << std::endl);
-}
-//****************************************************************************************************
+        ROS_INFO_STREAM("\n#############################################################\n#############################################################\n########	angles yaw:" << 	angles.yaw * 180 / M_PI	<< 		"\n########	reg:" << 	x_regulated << " " << y_regulated	<< 		"\n#############################################################\n#############################################################");
+
+// //DEBUG rinfo
+// //****************************************************************************************************
+// if(0)
+// {
+//     ROS_INFO_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
+//     << "FUNCTION NAME: check attraction vector on regulation" << std::endl 
+//     << "VARIABLES: "<< std::endl 
+//     << "x -->" << x_regulated << std::endl 
+//     << "y -->" << y_regulated << std::endl 
+//     << "yaw -->" << angles.yaw << std::endl 
+//     << "_________________________________" << std::endl << "_________________________________" << std::endl);
+// }
+// //****************************************************************************************************
 
         //CODEINFO Twist init and pub
         geometry_msgs::Twist twist;
@@ -934,7 +952,7 @@ if(0)
         q_finArrow.setRPY(angles.roll, angles.pitch, angles.yaw);
         q_finArrow.normalize();
 
-        total_arrow.set_frame("laser"); //FRAME
+        total_arrow.set_frame("map"); //FRAME
         total_arrow.set_namespace("speeds_namespace2");
         total_arrow.set_id(8);
         total_arrow.set_type(0);
@@ -947,18 +965,17 @@ if(0)
             total_arrow.publish_marker(); // PUBLISHER //RVIZ publish
         }
 
-        speed_pub.publish(twist); //PUBLISHER twist
+        if (REGULATOR_MODE != 4)
+        {
+            speed_pub.publish(twist); //PUBLISHER twist
+        }
         x_regulated = 0;
         y_regulated = 0;
-
-        repulsion_ready = 0;
-        attraction_ready = 0;
     }
 };
 
 PotentialFieldRepulsive *repulse_pointer;
 SpeedRegulator2D *regulator_pointer;
-PotentialFieldAttractive *attract_pointer;
 
 
 // Колбэк динамической реконфигурации
@@ -971,12 +988,6 @@ void dynamic_reconfigure_callback(apf_la::reconfigure_potential_fieldsConfig &co
     repulse_pointer->PUBLISH_VISIBLE_POINTS = config.RVIZ_calculated_points_cloud;
     repulse_pointer->PUBLISH_VISIBILITY_CIRCLE = config.RVIZ_visibility_circle;
 
-    attract_pointer->MULTIPLICATOR = config.attraction_multiplier;
-    attract_pointer->MAX_VECTOR = config.max_vector;
-    attract_pointer->PUBLISH_FINAL_ATTRACTION_ARROW = config.RVIZ_attraction_arrow;
-    attract_pointer->PUBLISH_GOAL = config.RVIZ_goal;
-
-    enable_attraction = config.enable_attraction;
     enable_turn_vectors_to_global = config.enable_turn_vectors_to_global;
 
     regulator_pointer->REGULATOR_MODE = config.regulator_mode;
@@ -990,27 +1001,11 @@ void got_scan_cb(const sensor_msgs::PointCloud::ConstPtr& catched_cloud)
 {
     repulse_pointer->calculate_repulse_vector(catched_cloud);
     regulator_pointer->set_regulate_one_vector_sum(repulse_pointer->finvec_x, repulse_pointer->finvec_y);
-    regulator_pointer->repulsion_ready = 1;
     // ЭТО БЫЛ РАССЧЕТ ОТТАЛКИВАНИЯ
-
-    attract_pointer->calculate_attract_vector();
-    if(enable_attraction == 1)
-    {
-        regulator_pointer->set_regulate_one_vector_sum(attract_pointer->finvec_x, attract_pointer->finvec_y);
-    }
-    regulator_pointer->attraction_ready = 1;
-    // ЭТО БЫЛ РАССЧЕТ ПРИТЯГИВАНИЯ
-}
-
-// Колбэк целевой точки(2d nav goal rviz)
-void got_goal_cb(const geometry_msgs::PoseStamped::ConstPtr& catched_goal)
-{
-    attract_pointer->goal_x = catched_goal->pose.position.x;
-    attract_pointer->goal_y = catched_goal->pose.position.y; // RETHINK
 }
 
 // Колбэк одометрии
-void got_odom_cb(const nav_msgs::Odometry::ConstPtr& catched_odom) // HOOK odom usage
+void got_odom_cb(const nav_msgs::Odometry::ConstPtr& catched_odom) 
 {
     global_odom.pose.pose.position.x = catched_odom->pose.pose.position.x; // LINK IN id12-031-23 get parameter
     global_odom.pose.pose.position.y = catched_odom->pose.pose.position.y; // LINK IN id12-031-23 get parameter 
@@ -1028,24 +1023,17 @@ int main(int argc, char **argv)
     nh_pointer = &nh;
 
     PotentialFieldRepulsive repulse(nh_pointer);
-    PotentialFieldAttractive attract;
     SpeedRegulator2D regulator;
 
     repulse_pointer = &repulse;
     regulator_pointer = &regulator;
-    attract_pointer = &attract;
 
     // NODEHANDLE
 
     //PUBLISHER adverts
     catchPC_sub = nh.subscribe("/transPC", 10, got_scan_cb); // SUB catchPC sub
 
-    if (enable_attraction == 1)
-    {
-        goal_sub = nh.subscribe("/move_base_simple/goal", 1000, got_goal_cb);
-    }
-    
-    odom_sub = nh.subscribe("/odom", 1000, got_odom_cb); //  HOOK odom usage
+    odom_sub = nh.subscribe("mavros/local_position/odom", 1000, got_odom_cb); 
 
     dynamic_reconfigure::Server<apf_la::reconfigure_potential_fieldsConfig> server;
     dynamic_reconfigure::Server<apf_la::reconfigure_potential_fieldsConfig>::CallbackType f;
@@ -1054,5 +1042,5 @@ int main(int argc, char **argv)
 
     ros::spin();
 
-    return 0;
+    return 0; 
 }   
