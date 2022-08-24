@@ -570,8 +570,8 @@ class   PotentialFieldAttractive
         MULTIPLICATOR = 0.2;   
         MAX_VECTOR = 0.3;
 
-        goal_x = NULL;
-        goal_y = NULL;
+        goal_x = 0;
+        goal_y = 0;
         finvec_x = 0;
         finvec_y = 0;
         
@@ -613,6 +613,12 @@ class   PotentialFieldAttractive
 
         finvec_x = tmpvec_x * cos(angles.yaw) - tmpvec_y * sin(angles.yaw);
         finvec_y = tmpvec_x * sin(angles.yaw) + tmpvec_y * cos(angles.yaw);
+
+        if(goal_x == 0 && goal_y == 0)
+        {
+            finvec_x = 0;
+            finvec_y = 0;
+        }
 
         if (finvec_x > MAX_VECTOR || finvec_x < - MAX_VECTOR)
         {
@@ -701,7 +707,7 @@ ROS_WARN_STREAM(std::endl << "angle is" << angles.yaw << std::endl);
         goal.set_namespace("speeds_namespace");
         goal.set_id(76);
         goal.set_type(2);
-        goal.set_pose(goal_x, goal_y, 0, q1);
+        goal.set_pose(goal_x, goal_y, 0.3, q1);
         goal.set_scale(0.05, 0.05, 0.05);
         goal.set_color(1.0, 1.0, 0.0, 0.0);
         // goal.debug_info("Goal");
@@ -938,7 +944,7 @@ if(0)
         total_arrow.set_namespace("speeds_namespace2");
         total_arrow.set_id(8);
         total_arrow.set_type(0);
-        total_arrow.set_pose(0, 0, 0, q_finArrow);
+        total_arrow.set_pose(0, 0, 0.3, q_finArrow);
         total_arrow.set_scale(sqrt(pow(x_regulated, 2) + pow(y_regulated, 2)), 0.05, 0.05);
         total_arrow.set_color(1.0, 0.0, 1.0, 1.0);
 

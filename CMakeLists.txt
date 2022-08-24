@@ -258,6 +258,7 @@ add_dependencies(astar_point_stacker apf_la_generate_messages_cpp)
 catkin_install_python(
 PROGRAMS
 scripts/astar.py
+scripts/local_map.py
 DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
