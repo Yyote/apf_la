@@ -16,6 +16,7 @@
 #include "visualization_msgs/Marker.h"
 #include "visualization_msgs/MarkerArray.h"
 #include "geometry_msgs/Twist.h"
+#include "geometry_msgs/TwistStamped.h"
 #include "geometry_msgs/TransformStamped.h"
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "tf2_ros/transform_broadcaster.h"
@@ -766,7 +767,7 @@ class SpeedRegulator2D
         total_arrow._init(nh_pointer, "/total_potential_fields_arrow");
         // total_arrow.advertise_to_topic("/final_PF_arrow");
         
-        speed_pub = nh_pointer->advertise<geometry_msgs::Twist>("/cmd_vel", 1000);
+        speed_pub = nh_pointer->advertise<geometry_msgs::Twist>("/potential_field/field_vel", 1000);
         potential_fields_vector_pub = nh_pointer->advertise<geometry_msgs::Vector3Stamped>("/potential_field_result_vector", 1000);
     }
 
@@ -836,20 +837,34 @@ ROS_INFO_STREAM("\n#############################################################
 // //****************************************************************************************************
 
         EulerAngles angles;
-        angles.yaw = (atan(y_regulated / x_regulated)/* - (M_PI) * (x_regulated < 0)*/); //BUG no vector inversion
-        angles.yaw = (angles.yaw + 2 * M_PI) * (angles.yaw < - M_PI) + (angles.yaw) * (!(angles.yaw < - M_PI));
+        // angles.yaw = (atan(y_regulated / x_regulated) - (M_PI) * (x_regulated < 0)); //BUG no vector inversion
+        // // angles.yaw = (angles.yaw)  * (angles.yaw < - M_PI) + (angles.yaw) * (!(angles.yaw < - M_PI));
+
+        angles.yaw = acos((x_regulated * 1 + y_regulated * 0) / (sqrt(x_regulated * x_regulated + y_regulated * y_regulated) * sqrt(1 * 1 + 0 * 0)));
+        angles.yaw = (angles.yaw) * (y_regulated > 0) + (-angles.yaw) * (!(y_regulated > 0));
 
         // angles.normalise_angles();
         ROS_INFO_STREAM("\n#############################################################\n#############################################################\n########	angles yaw:" << 	angles.yaw * 180 / M_PI	<< 		"\n########	reg:" << 	x_regulated << " " << y_regulated	<< 		"\n#############################################################\n#############################################################");
 
+        ROS_WARN_STREAM("ODOM YAW" << odom_orientation.yaw * 180 / M_PI);
+
+        double tmpvec_x, tmpvec_y;
+
         if(enable_turn_vectors_to_global)
         {
             // odom_orientation.yaw = -odom_orientation.yaw;
-            x_regulated = x_regulated * cos(-odom_orientation.yaw) - y_regulated * sin(-odom_orientation.yaw);
-            y_regulated = x_regulated * sin(-odom_orientation.yaw) + y_regulated * cos(-odom_orientation.yaw);
+            tmpvec_x = x_regulated * cos(odom_orientation.yaw) - y_regulated * sin(odom_orientation.yaw);
+            tmpvec_y = x_regulated * sin(odom_orientation.yaw) + y_regulated * cos(odom_orientation.yaw);
+            // tmpvec_x = tmpvec_x * cos(angles.yaw) - tmpvec_y * sin(angles.yaw);
+            // tmpvec_y = tmpvec_x * sin(angles.yaw) + tmpvec_y * cos(angles.yaw);
             // odom_orientation.yaw = -odom_orientation.yaw;
-            angles.yaw = (atan(y_regulated / x_regulated)/* - (M_PI) * (x_regulated < 0)*/); //BUG no vector inversion
-            angles.yaw = (angles.yaw + 2 * M_PI) * (angles.yaw < - M_PI) + (angles.yaw) * (!(angles.yaw < - M_PI));
+            // angles.yaw = (atan(y_regulated / x_regulated) - (M_PI) * (x_regulated < 0)); //BUG no vector inversion
+            // // angles.yaw = (angles.yaw) * (angles.yaw < - M_PI) + (angles.yaw) * (!(angles.yaw < - M_PI));
+            angles.yaw = acos((tmpvec_x * 1 + tmpvec_y * 0) / (sqrt(tmpvec_x * tmpvec_x + tmpvec_y * tmpvec_y) * sqrt(1 * 1 + 0 * 0)));
+            angles.yaw = (angles.yaw) * (tmpvec_y > 0) + (-angles.yaw) * (!(tmpvec_y > 0));
+
+            x_regulated = tmpvec_x;
+            y_regulated = tmpvec_y;
         }
 
         ROS_INFO_STREAM("\n#############################################################\n#############################################################\n########	angles yaw:" << 	angles.yaw * 180 / M_PI	<< 		"\n########	reg:" << 	x_regulated << " " << y_regulated	<< 		"\n#############################################################\n#############################################################");
@@ -881,7 +896,7 @@ ROS_INFO_STREAM("\n#############################################################
             }
             else
             {
-                if(abs(angles.yaw) - MAX_ANGLE_TO_ACCEPT_MOVEMENT < 0)
+                if(abs(angles.yaw) - MAX_ANGLE_TO_ACCEPT_MOVEMENT < 0 || REGULATOR_MODE == 2)
                 {
                     twist.angular.z = 0;
                     twist.linear.x = x_regulated * (x_regulated < MAX_LINEAR_SPEED) + MAX_LINEAR_SPEED * (x_regulated >= MAX_LINEAR_SPEED);
@@ -939,13 +954,12 @@ if(0)
 
         else if(REGULATOR_MODE == 4)
         {
-            geometry_msgs::Vector3Stamped vector;
+            geometry_msgs::TwistStamped twist_stamped;
             
-            vector.vector.x = x_regulated;
-            vector.vector.y = y_regulated;
-            vector.vector.z = 0;
+            twist_stamped.twist.linear.x = x_regulated;
+            twist_stamped.twist.linear.y = y_regulated;
 
-            potential_fields_vector_pub.publish(vector);
+            potential_fields_vector_pub.publish(twist_stamped);
         }
 
         tf2::Quaternion q_finArrow;
