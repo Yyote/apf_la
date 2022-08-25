@@ -767,8 +767,8 @@ class SpeedRegulator2D
         total_arrow._init(nh_pointer, "/total_potential_fields_arrow");
         // total_arrow.advertise_to_topic("/final_PF_arrow");
         
-        speed_pub = nh_pointer->advertise<geometry_msgs::Twist>("/potential_field/field_vel", 1000);
-        potential_fields_vector_pub = nh_pointer->advertise<geometry_msgs::Vector3Stamped>("/potential_field_result_vector", 1000);
+        speed_pub = nh_pointer->advertise<geometry_msgs::Twist>("/cmd_vel", 1000);
+        potential_fields_vector_pub = nh_pointer->advertise<geometry_msgs::TwistStamped>("/field_vel", 1000);
     }
 
     void set_regulate_one_vector(double x, double y)
