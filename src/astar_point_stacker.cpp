@@ -137,14 +137,22 @@ class AstarTrajectoryChecker
             //     ROS_INFO_STREAM("\n#############################################################\n#############################################################\n########	traj:" << 	local_trajectory.waypoints.at(i).pose.position.x	<< " " <<  local_trajectory.waypoints.at(i).pose.position.y	 <<	"\n########	localized traj:" << 	local_trajectory.waypoints.at(i).pose.position.x - global_odom.pose.pose.position.x	<< " " << local_trajectory.waypoints.at(i).pose.position.y - global_odom.pose.pose.position.y <<		"\n#############################################################\n#############################################################");
             //     local_trajectory.waypoints.at(i).pose.position.x = local_trajectory.waypoints.at(i).pose.position.x - global_odom.pose.pose.position.x;
             //     local_trajectory.waypoints.at(i).pose.position.y = local_trajectory.waypoints.at(i).pose.position.y - global_odom.pose.pose.position.y;
-            discrete_trajectory.waypoints.at(i).pose.position.x = discrete_trajectory.waypoints.at(i).pose.position.x - global_odom.pose.pose.position.x;
-            discrete_trajectory.waypoints.at(i).pose.position.y = discrete_trajectory.waypoints.at(i).pose.position.y - global_odom.pose.pose.position.y;
+            // discrete_trajectory.waypoints.at(i).pose.position.x = discrete_trajectory.waypoints.at(i).pose.position.x - global_odom.pose.pose.position.x;
+            // discrete_trajectory.waypoints.at(i).pose.position.y = discrete_trajectory.waypoints.at(i).pose.position.y - global_odom.pose.pose.position.y;
             
             // turn the point by the angle of the robot using the rotation matrix
             EulerAngles angles;
             angles.get_RPY_from_quaternion(tf2::Quaternion(global_odom.pose.pose.orientation.x, global_odom.pose.pose.orientation.y, global_odom.pose.pose.orientation.z, global_odom.pose.pose.orientation.w));
-            discrete_trajectory.waypoints.at(i).pose.position.x = discrete_trajectory.waypoints.at(i).pose.position.x * cos(-angles.yaw) - discrete_trajectory.waypoints.at(i).pose.position.y * sin(-angles.yaw);
-            discrete_trajectory.waypoints.at(i).pose.position.y = discrete_trajectory.waypoints.at(i).pose.position.x * sin(-angles.yaw) + discrete_trajectory.waypoints.at(i).pose.position.y * cos(-angles.yaw);
+
+            ROS_INFO_STREAM("Discrete trajectory waypoint before localizing: " << discrete_trajectory.waypoints.at(i).pose.position.x << " " << discrete_trajectory.waypoints.at(i).pose.position.y);
+
+            ROS_INFO_STREAM("Global_odom yaw angle:" << angles.yaw);
+
+            discrete_trajectory.waypoints.at(i).pose.position.x = discrete_trajectory.waypoints.at(i).pose.position.x * cos(angles.yaw) - discrete_trajectory.waypoints.at(i).pose.position.y * sin(angles.yaw);
+            discrete_trajectory.waypoints.at(i).pose.position.y = discrete_trajectory.waypoints.at(i).pose.position.x * sin(angles.yaw) + discrete_trajectory.waypoints.at(i).pose.position.y * cos(angles.yaw);
+
+// BUG игрек в одной из точек считается неправильно // BUG скорее всего дискретизация просиходит неправильно
+            ROS_INFO_STREAM("Discrete trajectory waypoint after localizing: " << discrete_trajectory.waypoints.at(i).pose.position.x << " " << discrete_trajectory.waypoints.at(i).pose.position.y);
         }
     }
 
@@ -239,8 +247,8 @@ ros::Publisher next_goal_pub;
 // Колбэк астара. Получает новую траекторию и записывает ее в класс для хранения
 void astar_cb(const apf_la::GlobalTrajectory::ConstPtr& trajectory)
 {
-        trajectory_storage.waypoints = trajectory->waypoints;
-        trajectory_checker.local_trajectory.waypoints = trajectory->waypoints;
+    trajectory_storage.waypoints = trajectory->waypoints;
+    trajectory_checker.local_trajectory.waypoints = trajectory->waypoints;
 
     ROS_INFO_STREAM("Received trajectory with " << trajectory->waypoints.size() << " waypoints");
     point_stacker.reset_goal_index();
@@ -266,6 +274,15 @@ void odom_cb(const nav_msgs::Odometry::ConstPtr& odom)
         next_goal_pub.publish(point_stacker.actual_goal);
         point_stacker.goal_is_sent = 1;
     }
+
+// EulerAngles angles;
+// angles.get_RPY_from_quaternion(tf2::Quaternion(odom->pose.pose.orientation.x, odom->pose.pose.orientation.y, odom->pose.pose.orientation.z, odom->pose.pose.orientation.w));
+
+// ROS_INFO_STREAM("Odom angles are: " << angles.roll * 180 / M_PI << " " << angles.pitch * 180 / M_PI << " " << angles.yaw * 180 / M_PI);
+
+// angles.get_RPY_from_quaternion(tf2::Quaternion(global_odom.pose.pose.orientation.x, global_odom.pose.pose.orientation.y, global_odom.pose.pose.orientation.z, global_odom.pose.pose.orientation.w));
+
+// ROS_INFO_STREAM("Global odom angles are: " << angles.roll * 180 / M_PI << " " << angles.pitch * 180 / M_PI << " " << angles.yaw * 180 / M_PI);
 }
 
 
