@@ -132,24 +132,24 @@ class AstarTrajectoryChecker
     void localize_trajectory()
     {
         ROS_ERROR_STREAM("ENTERED LOCALIZE TRAJECTORY");
-        for (int i = 0; i < local_trajectory.waypoints.size(); i++)
+        for (int i = 0; i < discrete_trajectory.waypoints.size(); i++)
         {
             //     ROS_INFO_STREAM("\n#############################################################\n#############################################################\n########	traj:" << 	local_trajectory.waypoints.at(i).pose.position.x	<< " " <<  local_trajectory.waypoints.at(i).pose.position.y	 <<	"\n########	localized traj:" << 	local_trajectory.waypoints.at(i).pose.position.x - global_odom.pose.pose.position.x	<< " " << local_trajectory.waypoints.at(i).pose.position.y - global_odom.pose.pose.position.y <<		"\n#############################################################\n#############################################################");
             //     local_trajectory.waypoints.at(i).pose.position.x = local_trajectory.waypoints.at(i).pose.position.x - global_odom.pose.pose.position.x;
             //     local_trajectory.waypoints.at(i).pose.position.y = local_trajectory.waypoints.at(i).pose.position.y - global_odom.pose.pose.position.y;
-            // discrete_trajectory.waypoints.at(i).pose.position.x = discrete_trajectory.waypoints.at(i).pose.position.x - global_odom.pose.pose.position.x;
-            // discrete_trajectory.waypoints.at(i).pose.position.y = discrete_trajectory.waypoints.at(i).pose.position.y - global_odom.pose.pose.position.y;
+            ROS_INFO_STREAM("Discrete trajectory waypoint before localizing: " << discrete_trajectory.waypoints.at(i).pose.position.x << " " << discrete_trajectory.waypoints.at(i).pose.position.y);
+            discrete_trajectory.waypoints.at(i).pose.position.x = discrete_trajectory.waypoints.at(i).pose.position.x + global_odom.pose.pose.position.x;
+            discrete_trajectory.waypoints.at(i).pose.position.y = discrete_trajectory.waypoints.at(i).pose.position.y + global_odom.pose.pose.position.y;
             
             // turn the point by the angle of the robot using the rotation matrix
             EulerAngles angles;
             angles.get_RPY_from_quaternion(tf2::Quaternion(global_odom.pose.pose.orientation.x, global_odom.pose.pose.orientation.y, global_odom.pose.pose.orientation.z, global_odom.pose.pose.orientation.w));
 
-            ROS_INFO_STREAM("Discrete trajectory waypoint before localizing: " << discrete_trajectory.waypoints.at(i).pose.position.x << " " << discrete_trajectory.waypoints.at(i).pose.position.y);
 
-            ROS_INFO_STREAM("Global_odom yaw angle:" << angles.yaw);
+            ROS_INFO_STREAM("Global_odom yaw angle:" << angles.yaw * 180 / M_PI);
 
-            discrete_trajectory.waypoints.at(i).pose.position.x = discrete_trajectory.waypoints.at(i).pose.position.x * cos(angles.yaw) - discrete_trajectory.waypoints.at(i).pose.position.y * sin(angles.yaw);
-            discrete_trajectory.waypoints.at(i).pose.position.y = discrete_trajectory.waypoints.at(i).pose.position.x * sin(angles.yaw) + discrete_trajectory.waypoints.at(i).pose.position.y * cos(angles.yaw);
+            // discrete_trajectory.waypoints.at(i).pose.position.x = discrete_trajectory.waypoints.at(i).pose.position.x * cos(angles.yaw) - discrete_trajectory.waypoints.at(i).pose.position.y * sin(angles.yaw);
+            // discrete_trajectory.waypoints.at(i).pose.position.y = discrete_trajectory.waypoints.at(i).pose.position.x * sin(angles.yaw) + discrete_trajectory.waypoints.at(i).pose.position.y * cos(angles.yaw);
 
 // BUG игрек в одной из точек считается неправильно // BUG скорее всего дискретизация просиходит неправильно
             ROS_INFO_STREAM("Discrete trajectory waypoint after localizing: " << discrete_trajectory.waypoints.at(i).pose.position.x << " " << discrete_trajectory.waypoints.at(i).pose.position.y);
