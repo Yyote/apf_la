@@ -376,18 +376,18 @@ class PotentialFieldRepulsive {
             {
                 if(!( pow(catched_cloud->points.at(i).x, 2) + pow(catched_cloud->points.at(i).y, 2) >= MAX_RANGE * MAX_RANGE || pow(catched_cloud->points.at(i).x, 2) + pow(catched_cloud->points.at(i).y, 2) <= MIN_RANGE * MIN_RANGE))  // Проверка на попадание в зону видимости
                 {
-//DEBUG INFO rinfo
-//****************************************************************************************************
-if(0)
-{
-    ROS_INFO_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
-    << "FUNCTION NAME: zero fight" << std::endl 
-    << "VARIABLES: "
-    << "vector length -->"  << sqrt(pow(catched_cloud->points.at(i).x, 2) + pow(catched_cloud->points.at(i).y, 2)) << std::endl
-    << "MAX_RANGE -->"  << MAX_RANGE << std::endl 
-    << "_________________________________" << std::endl << "_________________________________" << std::endl);
-}
-//****************************************************************************************************
+// //DEBUG INFO rinfo
+// //****************************************************************************************************
+// if(0)
+// {
+//     ROS_INFO_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
+//     << "FUNCTION NAME: zero fight" << std::endl 
+//     << "VARIABLES: "
+//     << "vector length -->"  << sqrt(pow(catched_cloud->points.at(i).x, 2) + pow(catched_cloud->points.at(i).y, 2)) << std::endl
+//     << "MAX_RANGE -->"  << MAX_RANGE << std::endl 
+//     << "_________________________________" << std::endl << "_________________________________" << std::endl);
+// }
+// //****************************************************************************************************
 
                     if (catched_cloud->points.at(i).x != 0)
                     {
@@ -400,22 +400,22 @@ if(0)
                         tmpvec_x = MULTIPLICATOR * point_step * ( (1 / vector_length) * cos(atan(catched_cloud->points.at(i).x / catched_cloud->points.at(i).y))/* - (MAX_RANGE / sqrt(2))*/ ); // SOLVED change the formula for the pithagorean
                     }
 
-//DEBUG INFO rwarn
-//****************************************************************************************************
-if(0)
-{
-    ROS_WARN_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
-    << "FUNCTION NAME: tmpvec_y check" << std::endl 
-    << "VARIABLES: " << std::endl
-    << "catched point y -->"  << catched_cloud->points.at(i).y << std::endl 
-    << "catched point x -->"  << catched_cloud->points.at(i).x << std::endl 
-    << "tmpvec_y -->"  << tmpvec_y << std::endl 
-    << "sin(atan(catched_cloud->points.at(i).y / catched_cloud->points.at(i).x)) * (1 / vec_length) -->"  << (1 / vector_length) * sin(atan(catched_cloud->points.at(i).y / catched_cloud->points.at(i).x)) << std::endl 
-    << "tmpvec_x -->"  << tmpvec_x << std::endl 
-    << "cos(atan(catched_cloud->points.at(i).y / catched_cloud->points.at(i).x)) * (1 / vec_length) -->"  << (1 / vector_length) * cos(atan(catched_cloud->points.at(i).y / catched_cloud->points.at(i).x)) << std::endl 
-    << "_________________________________" << std::endl << "_________________________________" << std::endl);
-}
-//****************************************************************************************************
+// //DEBUG INFO rwarn
+// //****************************************************************************************************
+// if(0)
+// {
+//     ROS_WARN_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
+//     << "FUNCTION NAME: tmpvec_y check" << std::endl 
+//     << "VARIABLES: " << std::endl
+//     << "catched point y -->"  << catched_cloud->points.at(i).y << std::endl 
+//     << "catched point x -->"  << catched_cloud->points.at(i).x << std::endl 
+//     << "tmpvec_y -->"  << tmpvec_y << std::endl 
+//     << "sin(atan(catched_cloud->points.at(i).y / catched_cloud->points.at(i).x)) * (1 / vec_length) -->"  << (1 / vector_length) * sin(atan(catched_cloud->points.at(i).y / catched_cloud->points.at(i).x)) << std::endl 
+//     << "tmpvec_x -->"  << tmpvec_x << std::endl 
+//     << "cos(atan(catched_cloud->points.at(i).y / catched_cloud->points.at(i).x)) * (1 / vec_length) -->"  << (1 / vector_length) * cos(atan(catched_cloud->points.at(i).y / catched_cloud->points.at(i).x)) << std::endl 
+//     << "_________________________________" << std::endl << "_________________________________" << std::endl);
+// }
+// //****************************************************************************************************
 
                     if(catched_cloud->points.at(i).x > 0 && tmpvec_x > 0)
                     {
@@ -441,36 +441,36 @@ if(0)
                     bufx = finvec_x;
                     bufy = finvec_y;          
 
-// DEBUG INFO rinfo
-if(0)
-{
-    ROS_INFO_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl << "FUNCTION NAME: average coordinates calculation" << std::endl 
-    << "VARIABLES: list of vars" << "\ncloud capacity, finvec_x and y, vector length, i:" << std::endl 
-    << catched_cloud->points.capacity() << " "  << finvec_x << " " << finvec_y << " " << sqrt(pow(finvec_x, 2) + pow(finvec_y, 2)) << " " << i << std::endl 
-    << "catched_cloud->points.at(i).x --> " << catched_cloud->points.at(i).x << std::endl << "catched_cloud->points.at(i).y --> " << catched_cloud->points.at(i).y << std::endl 
-    <<"_________________________________" << std::endl << "_________________________________" << std::endl);
-}
+// // DEBUG INFO rinfo
+// if(0)
+// {
+//     ROS_INFO_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl << "FUNCTION NAME: average coordinates calculation" << std::endl 
+//     << "VARIABLES: list of vars" << "\ncloud capacity, finvec_x and y, vector length, i:" << std::endl 
+//     << catched_cloud->points.capacity() << " "  << finvec_x << " " << finvec_y << " " << sqrt(pow(finvec_x, 2) + pow(finvec_y, 2)) << " " << i << std::endl 
+//     << "catched_cloud->points.at(i).x --> " << catched_cloud->points.at(i).x << std::endl << "catched_cloud->points.at(i).y --> " << catched_cloud->points.at(i).y << std::endl 
+//     <<"_________________________________" << std::endl << "_________________________________" << std::endl);
+// }
 
-                    // DEBUG rerror
-                    if (finvec_x == finvec_y && finvec_x != 0)
-                    {
-                        ROS_ERROR_STREAM("FINVECX IS EQ TO FINVECY. terminated.");
-                        shutdown();
-                    }
+                    // // DEBUG rerror
+                    // if (finvec_x == finvec_y && finvec_x != 0)
+                    // {
+                    //     ROS_ERROR_STREAM("FINVECX IS EQ TO FINVECY. terminated.");
+                    //     shutdown();
+                    // }
 
-                    if(finvec_x - bufx > 50 || finvec_y - bufy > 50) //DEBUG rerror
-                    {
-                        ROS_ERROR_STREAM("FINVEC IS EXCEEDING LIMITS AND AVOIDS FILTRATION --> " << std::endl << "finvec_x ---> " << finvec_x << std::endl << "finvec_y ---> " << finvec_y);
-                        shutdown();
-                    }
+                    // if(finvec_x - bufx > 50 || finvec_y - bufy > 50) //DEBUG rerror
+                    // {
+                    //     ROS_ERROR_STREAM("FINVEC IS EXCEEDING LIMITS AND AVOIDS FILTRATION --> " << std::endl << "finvec_x ---> " << finvec_x << std::endl << "finvec_y ---> " << finvec_y);
+                    //     shutdown();
+                    // }
                 }
             }
         }
 
-if(0)
-{
-    ROS_WARN_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl << "FUNCTION NAME: result vector in variables" << std::endl << "VARIABLES: list of vars:" << std::endl << "finvec_x -->" << finvec_x << std::endl << "finvec_y -->" << finvec_y << std::endl << "vector length -->" << sqrt(pow(finvec_x , 2) + pow(finvec_y , 2)) <<  std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl);
-}   
+// if(0)
+// {
+//     ROS_WARN_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl << "FUNCTION NAME: result vector in variables" << std::endl << "VARIABLES: list of vars:" << std::endl << "finvec_x -->" << finvec_x << std::endl << "finvec_y -->" << finvec_y << std::endl << "vector length -->" << sqrt(pow(finvec_x , 2) + pow(finvec_y , 2)) <<  std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl);
+// }   
 
         // CODEINFO angle calculation to pass to rviz markers ---> calculate current(i) vector's angle 
         angles.yaw = (atan(finvec_y/finvec_x)/* - (M_PI) * (finvec_x > 0)*/); //BUG no vector inversion
@@ -482,15 +482,15 @@ if(0)
         q.setRPY(angles.roll, angles.pitch, angles.yaw - (M_PI) * (finvec_x > 0));
         q = q.normalize(); //SOLVED something is going with angle. cant say what, maybe its not a bug ---> in velocity calculation there was an if statement that tried to pass only > 0.001 coordiantes. It totally deleted all negative values from coordinates
 
-// DEBUG INFO rinfo
-if(0)
-{
-    ROS_INFO_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
-    << "FUNCTION NAME: angle calc" << std::endl 
-    << "VARIABLES: " << std::endl 
-    << "angles.yaw (atan)-->" << angles.yaw << std::endl << "finvec_y/finvec_x --> " << finvec_y/finvec_x << std::endl << "finvec_y --> " << finvec_y << std::endl << "finvec_x --> " << finvec_x << std::endl << std::endl 
-    << "_________________________________" << std::endl << "_________________________________" << std::endl);
-}
+// // DEBUG INFO rinfo
+// if(0)
+// {
+//     ROS_INFO_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
+//     << "FUNCTION NAME: angle calc" << std::endl 
+//     << "VARIABLES: " << std::endl 
+//     << "angles.yaw (atan)-->" << angles.yaw << std::endl << "finvec_y/finvec_x --> " << finvec_y/finvec_x << std::endl << "finvec_y --> " << finvec_y << std::endl << "finvec_x --> " << finvec_x << std::endl << std::endl 
+//     << "_________________________________" << std::endl << "_________________________________" << std::endl);
+// }
 
         // // Если включено, вектор поворачивается в глобальную систему координат для визуализации и только. Передача финального вектора в глобальную систему идет в РЕГУЛЯТОРЕ
         // if(enable_turn_vectors_to_global)
@@ -535,7 +535,7 @@ if(0)
 
         if(PUBLISH_VISIBILITY_CIRCLE == 1)
         {
-            visibility_circle.publish_marker(); // PUBLISHER //RVIZ publish
+            // visibility_circle.publish_marker(); // PUBLISHER //RVIZ publish
         }
         //* - * - * - * - * - * - * - * - * - * - * - */ - */ - * - * - * - * - *
         //* - * - * - * - * - * - * - * - * - * - * - */ - */ - * - * - * - * - *
@@ -921,27 +921,27 @@ ROS_INFO_STREAM("\n#############################################################
                 }
                 else
                 {
-if(0)
-{
-    ROS_ERROR_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
-    << "FUNCTION NAME: angle calc" << std::endl 
-    << "VARIABLES: " << std::endl 
-    << "angles.yaw (atan)-->" << angles.yaw << std::endl << "y_regulated/x_regulated --> " << y_regulated/x_regulated << std::endl << "y_regulated --> " << y_regulated << std::endl << "x_regulated --> " << x_regulated << std::endl << std::endl 
-    << "_________________________________" << std::endl << "_________________________________" << std::endl);
-}
-//DEBUG INFO rerror
-//****************************************************************************************************
-if(0)
-{
-    ROS_ERROR_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
-    << "FUNCTION NAME: some shit is happening" << std::endl 
-    << "VARIABLES: "
-    << "angles.yaw -->" << angles.yaw << std::endl 
-    << "REGULATOR_MODE -->" << REGULATOR_MODE << std::endl 
-    << "M_PI -->" << M_PI << std::endl 
-    << "_________________________________" << std::endl << "_________________________________" << std::endl);
-}
-//****************************************************************************************************
+// if(0)
+// {
+//     ROS_ERROR_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
+//     << "FUNCTION NAME: angle calc" << std::endl 
+//     << "VARIABLES: " << std::endl 
+//     << "angles.yaw (atan)-->" << angles.yaw << std::endl << "y_regulated/x_regulated --> " << y_regulated/x_regulated << std::endl << "y_regulated --> " << y_regulated << std::endl << "x_regulated --> " << x_regulated << std::endl << std::endl 
+//     << "_________________________________" << std::endl << "_________________________________" << std::endl);
+// }
+// //DEBUG INFO rerror
+// //****************************************************************************************************
+// if(0)
+// {
+//     ROS_ERROR_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
+//     << "FUNCTION NAME: some shit is happening" << std::endl 
+//     << "VARIABLES: "
+//     << "angles.yaw -->" << angles.yaw << std::endl 
+//     << "REGULATOR_MODE -->" << REGULATOR_MODE << std::endl 
+//     << "M_PI -->" << M_PI << std::endl 
+//     << "_________________________________" << std::endl << "_________________________________" << std::endl);
+// }
+// //****************************************************************************************************
                 }
             }
         }
