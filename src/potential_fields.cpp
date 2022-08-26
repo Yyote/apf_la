@@ -956,6 +956,9 @@ ROS_INFO_STREAM("\n#############################################################
         {
             geometry_msgs::TwistStamped twist_stamped;
             
+            x_regulated= (x_regulated) * (x_regulated < MAX_LINEAR_SPEED) + MAX_LINEAR_SPEED * (x_regulated >= MAX_LINEAR_SPEED);
+            y_regulated= (y_regulated) * (y_regulated < MAX_LINEAR_SPEED) + MAX_LINEAR_SPEED * (y_regulated >= MAX_LINEAR_SPEED);
+
             twist_stamped.twist.linear.x = x_regulated;
             twist_stamped.twist.linear.y = y_regulated;
 
