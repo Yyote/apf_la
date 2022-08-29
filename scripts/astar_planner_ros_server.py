@@ -229,7 +229,7 @@ class AStarPlanner:
 
         i = 0
 
-        while i < 2:
+        while i < math.ceil(self.rr/self.resolution):
             if (
                 self.grid_map_.data[
                     get_index(
@@ -317,7 +317,7 @@ class GlobalPlanner():
         # self.filter_traj_threshold = 0.5
         # self.consider_unfound_area_flag = False
 
-        self.radius_of_robot = rospy.get_param('~radius_of_robot', 0.1)
+        self.radius_of_robot = rospy.get_param('~radius_of_robot', 0.25)
         self.filter_traj_threshold = rospy.get_param(
             '~filter_traj_threshold', 0.5)
         self.consider_unfound_area_flag = rospy.get_param(
@@ -419,8 +419,8 @@ class GlobalPlanner():
         for i in range(len(trajectory)):
             waypoint = Point()
             # waypoint.header.stamp = rospy.get_time()
-            waypoint.x = trajectory[i][0]
-            waypoint.y = trajectory[i][1]
+            waypoint.x = trajectory[i][1]
+            waypoint.y = trajectory[i][0]
             waypoint.z = 0.1
             marker_path.points.append(waypoint)
 
@@ -454,6 +454,7 @@ class GlobalPlanner():
 
             marker_arr.markers.append(waypoint)
         self.marker_obs_pub.publish(marker_arr)
+        print(f"R radius = {self.radius_of_robot}")
 
     def getAngleBetweenPoints(self, p1, p2):
         angle = math.atan2(p2[1] - p1[1], p2[0] - p1[0])
@@ -615,7 +616,7 @@ class GlobalPlanner():
         #     obs_y.append(y)
         #     # print(f"OBSTACLE {i} {[x, y]}")
         # self.display_obs(obs_x, obs_y)
-
+        print(f"Robot rad = {self.radius_of_robot}")
         a_star = AStarPlanner(
             self.grid_map_.info.resolution, self.radius_of_robot, self.grid_map_
         )

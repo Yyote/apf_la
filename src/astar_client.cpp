@@ -15,7 +15,7 @@ ros::Publisher trajectory_vis_pub;
 
 geometry_msgs::PoseStamped bufferized_goal;
 std::vector<nav_msgs::Odometry> bufferized_odometry;
-int stuck_probability_counter = 0;
+int succ = 0;
 
 
 void goal_cb(const geometry_msgs::PoseStamped::ConstPtr& goal)
@@ -49,9 +49,9 @@ void goal_cb(const geometry_msgs::PoseStamped::ConstPtr& goal)
 
 void vel_cb(const geometry_msgs::Twist::ConstPtr& velocity)
 {
-    if( sqrt(pow(velocity->linear.x, 2) + pow(velocity->linear.y, 2)) < 0.01 && velocity->angular.z < 0.2 )
+    if( sqrt(pow(velocity->linear.x, 2) + pow(velocity->linear.y, 2)) < 0.01 && abs(velocity->angular.z < 0.2) )
     {
-        stuck_probability_counter++;
+        succ++;
     }
 }
 
@@ -64,24 +64,29 @@ void odom_cb (const nav_msgs::Odometry::ConstPtr& odom)
     }
     bufferized_odometry.at(bufferized_odometry.size()-1) = *odom;
 
-    std::vector<geometry_msgs::Point> odom_delta;
-    odom_delta.resize(bufferized_odometry.size()-1);
-
-    for(int i = 1; i < bufferized_odometry.size() - 1; i++)
+    if( sqrt(pow(odom->twist.twist.linear.x, 2) + pow(odom->twist.twist.linear.y, 2)) < 0.01 && abs(odom->twist.twist.angular.z < 0.2) )
     {
-        odom_delta.at(i).x = bufferized_odometry.at(i).pose.pose.position.x - bufferized_odometry.at(i-1).pose.pose.position.x;
-        odom_delta.at(i).y = bufferized_odometry.at(i).pose.pose.position.y - bufferized_odometry.at(i-1).pose.pose.position.y;
+        succ++;
     }
 
-    for (int i = 1; i < odom_delta.size() - 1; i++)
-    {
-        if (sqrt(pow(odom_delta.at(i).x, 2) + pow(odom_delta.at(i).y, 2)) - sqrt(pow(odom_delta.at(i-1).x, 2) + pow(odom_delta.at(i-1).y, 2)) > 0.01)
-        {
-            stuck_probability_counter++;
-        }
-    }
+    // std::vector<geometry_msgs::Point> odom_delta;
+    // odom_delta.resize(bufferized_odometry.size()-1);
 
-    if(stuck_probability_counter >= 10)
+    // for(int i = 1; i < bufferized_odometry.size() - 1; i++)
+    // {
+    //     odom_delta.at(i).x = bufferized_odometry.at(i).pose.pose.position.x - bufferized_odometry.at(i-1).pose.pose.position.x;
+    //     odom_delta.at(i).y = bufferized_odometry.at(i).pose.pose.position.y - bufferized_odometry.at(i-1).pose.pose.position.y;
+    // }
+
+    // for (int i = 1; i < odom_delta.size() - 1; i++)
+    // {
+    //     if (sqrt(pow(odom_delta.at(i).x, 2) + pow(odom_delta.at(i).y, 2)) - sqrt(pow(odom_delta.at(i-1).x, 2) + pow(odom_delta.at(i-1).y, 2)) > 0.001)
+    //     {
+    //         succ++;
+    //     }
+    // }
+
+    if(succ >= 25)
     {
         apf_la::GetTrajectory srv;
         srv.request.goal_position.pose.position.x = bufferized_goal.pose.position.x;
@@ -97,7 +102,7 @@ void odom_cb (const nav_msgs::Odometry::ConstPtr& odom)
             }
             trajectory_pub.publish(trajectory);
             ROS_INFO_STREAM("Published trajectory with" << srv.response.path.size() << "waypoints\n");
-            stuck_probability_counter = 0;
+            succ = 0;
         }
 
         else
