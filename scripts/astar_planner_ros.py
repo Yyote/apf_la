@@ -231,16 +231,16 @@ class GlobalPlanner():
         self.start_pose_grid = ()
         self.goal_pose_grid = ()
 
-        self.radius_of_robot = 0.2 # radius of robot
+        self.radius_of_robot = 0.8
         self.filter_traj_threshold = 0.5
 
         rospy.Subscriber("/map", OccupancyGrid, self.map_clb, queue_size=10)
-        rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.robot_pose_clb, queue_size=10)  # odometry in PoseStamped # CODEINFO odometry
-        rospy.Subscriber("/move_base_simple/goal", PoseStamped, self.goal_pose_clb, queue_size=10)
+        rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.robot_pose_clb, queue_size=10)
+        rospy.Subscriber("/goal_point", PoseStamped, self.goal_pose_clb, queue_size=10)
 
         self.send_trajectory_pub = rospy.Publisher("/astar/trajectory", GlobalTrajectory,  queue_size=10)
         self.marker_path_pub = rospy.Publisher("/astar/viz/global_path", Marker, queue_size=10)
-        self.marker_obs_pub = rospy.Publisher("/astar/viz/obstacles", MarkerArray, queue_size=10)
+        self.marker_obs_pub = rospy.Publisher("/astar/viz/obstacles", MarkerArray, queue_size=10)   # TODO: сделать поинтклауд вместо маркеров, должно разгрузить
         
         while not rospy.is_shutdown():
             self.planner_loop()
@@ -271,12 +271,10 @@ class GlobalPlanner():
         """
         self.obstacle_map.clear()
         for i in range(len(self.grid_map_.data)):
-            if self.grid_map_.data[i] > 50 or self.grid_map_.data[i] == -1:
+            if self.grid_map_.data[i] > 50: #or self.grid_map_.data[i] == -1
                 obj_exist = i in self.obstacle_map
                 if obj_exist == False:
                     self.obstacle_map.append(i)
-            # elif self.grid_map_.data[i] == -1:
-                # self.obstacle_map.append(i)
 
 
     def world_to_map(self, x:int, y:int):
@@ -534,7 +532,7 @@ class GlobalPlanner():
         
         if rx is None and ry is None:
             self.trajectory_sended = True
-            print("Fail!")
+            print("The trajectory is not found!")
             return
 
         rx.reverse()
@@ -547,10 +545,9 @@ class GlobalPlanner():
             waypoint.append(ry[i])
             trajectory.append(waypoint)
 
-        print("Input: " + str(len(trajectory)))
         # trajectory = self.filter_trajectory_by_saw(trajectory, self.filter_traj_threshold)
         trajectory = self.filter_trajectory_by_angle(trajectory, 0.1, 0.5)
-        print("Output: " + str(len(trajectory)))
+        print("Trajectory output: " + str(len(trajectory)))
 
 
         self.display_path(trajectory)

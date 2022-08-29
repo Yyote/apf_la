@@ -701,7 +701,7 @@ ROS_WARN_STREAM(std::endl << "angle is" << angles.yaw << std::endl);
         goal.set_namespace("speeds_namespace");
         goal.set_id(76);
         goal.set_type(2);
-        goal.set_pose(goal_x, goal_y, 0, q1);
+        goal.set_pose(goal_x, goal_y, 0.05, q1);
         goal.set_scale(0.05, 0.05, 0.05);
         goal.set_color(1.0, 1.0, 0.0, 0.0);
         // goal.debug_info("Goal");
@@ -734,6 +734,8 @@ class SpeedRegulator2D
     public:
     double MAX_LINEAR_SPEED;
     double MAX_ANGULAR_SPEED;
+    double MIN_ANGULAR_SPEED;
+    double MIN_ANGLE_THRESHOLD;
     double MAX_ANGLE_TO_ACCEPT_MOVEMENT;
     int REGULATOR_MODE; //1 - wheeled bot safe, 2 - quadrocopter, 3 - y is turning by yaw
     int repulsion_ready;
@@ -743,10 +745,12 @@ class SpeedRegulator2D
     SpeedRegulator2D()
     {
         REGULATOR_MODE = 3;
-        MAX_ANGLE_TO_ACCEPT_MOVEMENT = 0.1;
+        MAX_ANGLE_TO_ACCEPT_MOVEMENT = 0.02;
         PUBLISH_TOTAL_ARROW = 1;
         MAX_LINEAR_SPEED = 0.2;
         MAX_ANGULAR_SPEED = 0.75;
+        MIN_ANGULAR_SPEED = 0.2;
+        MIN_ANGLE_THRESHOLD = 0.1;
 
         x_regulated = 0;
         y_regulated = 0;
@@ -915,7 +919,7 @@ if(0)
 
         else if (REGULATOR_MODE == 3)
         {
-            twist.angular.z = y_regulated * (y_regulated < MAX_ANGULAR_SPEED) + MAX_ANGULAR_SPEED * (!(y_regulated < MAX_ANGULAR_SPEED));
+            twist.angular.z = y_regulated * (y_regulated < MAX_ANGULAR_SPEED) + MAX_ANGULAR_SPEED * (!(y_regulated < MAX_ANGULAR_SPEED)) + MIN_ANGULAR_SPEED * (y_regulated >= MIN_ANGLE_THRESHOLD && y_regulated < MIN_ANGULAR_SPEED && y_regulated > 0) - MIN_ANGULAR_SPEED * (y_regulated >= MIN_ANGLE_THRESHOLD && y_regulated < MIN_ANGULAR_SPEED && y_regulated < 0);
             twist.linear.x = x_regulated  * (x_regulated < MAX_LINEAR_SPEED) + MAX_LINEAR_SPEED * (x_regulated >= MAX_LINEAR_SPEED);
         }
 
@@ -982,6 +986,8 @@ void dynamic_reconfigure_callback(apf_la::reconfigure_potential_fieldsConfig &co
     regulator_pointer->REGULATOR_MODE = config.regulator_mode;
     regulator_pointer->MAX_LINEAR_SPEED = config.max_linear_speed;
     regulator_pointer->MAX_ANGULAR_SPEED = config.max_angular_speed;
+    regulator_pointer->MAX_ANGLE_TO_ACCEPT_MOVEMENT = config.min_angular_speed_threshold;
+    regulator_pointer->MIN_ANGULAR_SPEED = config.min_angular_speed;
     regulator_pointer->MAX_ANGLE_TO_ACCEPT_MOVEMENT = config.max_angle_to_accept_movement;
 } 
 

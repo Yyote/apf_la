@@ -60,12 +60,11 @@ add_message_files(
   GlobalTrajectory.msg
 )
 
-## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+# Generate services in the 'srv' folder
+add_service_files(
+  FILES
+  GetTrajectory.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -255,9 +254,15 @@ add_executable(astar_point_stacker src/astar_point_stacker.cpp)
 target_link_libraries(astar_point_stacker ${catkin_LIBRARIES})
 add_dependencies(astar_point_stacker apf_la_generate_messages_cpp)
 
+add_executable(astar_client src/astar_client.cpp)
+target_link_libraries(astar_client ${catkin_LIBRARIES})
+add_dependencies(astar_client apf_la_generate_messages_cpp)
+
 catkin_install_python(
 PROGRAMS
 scripts/astar.py
+scripts/astar_planner_ros_server.py
+# scripts/astar_planner_ros.py
 DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
