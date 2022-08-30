@@ -1,4 +1,4 @@
-// LaserScan to PointCLoud converter for a single Lidar
+// LaserScan to PointCLoud converter for a single RPLidar
 // 
 // Listens to topic /scan
 // Publishes to topic /transPc
@@ -20,27 +20,35 @@ laser_geometry::LaserProjection projector_;
 
 void chatterCallback(const sensor_msgs::LaserScan::ConstPtr& scan_in)
 {
-    sensor_msgs::PointCloud cloud;
-    cloud.points.resize(360);
+  sensor_msgs::PointCloud cloud;
 
-    projector_.projectLaser(*scan_in, cloud);
-    cloud.header.frame_id = "laser"; // PC //LOG NEW changed frame to laser
-    cloud.header.seq = 69;
-    cloud.header.stamp = ros::Time::now();
+  cloud.points.resize(360);
+
+  projector_.projectLaser(*scan_in, cloud);
+  cloud.header.frame_id = "laser"; // PC //LOG NEW changed frame to laser
+  cloud.header.seq = 69;
+  cloud.header.stamp = ros::Time::now();
 
 // AAA Dedicating points.at(69).z to scan_time to calculate velocities in other nodes
+  if(cloud.points.size() > 0)
+  {
     cloud.points.at(69).z = scan_in->scan_time;
-    cloud_pub.publish(cloud);
+  }
+
+  cloud_pub.publish(cloud);
 }
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "lidar_to_pointcloud");
-    ros::NodeHandle n;
+  ros::init(argc, argv, "lidar_to_pointcloud");
+  
+  ros::NodeHandle n;
 
-    Laser_sub = n.subscribe("/scan", 100, chatterCallback);
-    cloud_pub = n.advertise<sensor_msgs::PointCloud>("transPC", 100);
+  Laser_sub = n.subscribe("/scan", 100, chatterCallback);
+  cloud_pub = n.advertise<sensor_msgs::PointCloud>("transPC", 100);
 
-    ros::spin();
-    return 0;
+
+
+  ros::spin();
+  return 0;
 }
