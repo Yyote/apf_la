@@ -30,7 +30,7 @@ void chatterCallback(const sensor_msgs::LaserScan::ConstPtr& scan_in)
   cloud.header.stamp = ros::Time::now();
 
 // AAA Dedicating points.at(69).z to scan_time to calculate velocities in other nodes
-  if(cloud.points.size() > 0)
+  if(cloud.points.size() > 70)
   {
     cloud.points.at(69).z = scan_in->scan_time;
   }

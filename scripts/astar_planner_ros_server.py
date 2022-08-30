@@ -317,7 +317,7 @@ class GlobalPlanner():
         # self.filter_traj_threshold = 0.5
         # self.consider_unfound_area_flag = False
 
-        self.radius_of_robot = rospy.get_param('~radius_of_robot', 0.25)
+        self.radius_of_robot = rospy.get_param('~radius_of_robot', 0.2)
         self.filter_traj_threshold = rospy.get_param(
             '~filter_traj_threshold', 0.5)
         self.consider_unfound_area_flag = rospy.get_param(
