@@ -30,7 +30,10 @@ void chatterCallback(const sensor_msgs::LaserScan::ConstPtr& scan_in)
   cloud.header.stamp = ros::Time::now();
 
 // AAA Dedicating points.at(69).z to scan_time to calculate velocities in other nodes
-  cloud.points.at(69).z = scan_in->scan_time;
+  if(cloud.points.size() > 0)
+  {
+    cloud.points.at(69).z = scan_in->scan_time;
+  }
 
   cloud_pub.publish(cloud);
 }
@@ -42,7 +45,7 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   Laser_sub = n.subscribe("/scan", 100, chatterCallback);
-  cloud_pub = n.advertise<sensor_msgs::PointCloud>("/transPC", 100);
+  cloud_pub = n.advertise<sensor_msgs::PointCloud>("transPC", 100);
 
 
 
