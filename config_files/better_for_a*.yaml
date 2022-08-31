@@ -37,7 +37,7 @@ dictitems:
         state: []
       parent: 0
       regulator_mode: 3
-      repulsion_multiplier: 0.0045
+      repulsion_multiplier: 0.003
       state: true
       type: ''
     state: []
@@ -51,5 +51,5 @@ dictitems:
   min_angular_speed_threshold: 0.02
   min_calculation_distance: 0.1
   regulator_mode: 3
-  repulsion_multiplier: 0.0045
+  repulsion_multiplier: 0.003
 state: []
