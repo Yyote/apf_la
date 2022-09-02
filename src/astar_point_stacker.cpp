@@ -5,6 +5,8 @@
 #include "geometry_msgs/PoseStamped.h"
 
 apf_la::GlobalTrajectory trajectory_storage;
+nav_msgs::Odometry global_odom;
+double timer;
 
 // Класс для хранения траектории
 class AstarPointStacker
@@ -27,7 +29,7 @@ class AstarPointStacker
     {
 //DEBUG rinfo
 //****************************************************************************************************
-if(1)
+if(0)
 {
     ROS_INFO_STREAM(std::endl << "_________________________________" << std::endl << "_________________________________" << std::endl 
     << "FUNCTION NAME: get_next_goal()" << std::endl 
@@ -43,12 +45,23 @@ if(1)
             actual_goal = trajectory_storage.waypoints.at(goal_index);
             goal_is_sent = 0;
             ROS_INFO_STREAM("1st if");
+            if (goal_index == 0)
+            {
+                timer = ros::Time::now().toSec();
+                ROS_WARN_STREAM("Started timer ---> " << timer);
+            }
         }
 
         if (goal_index < trajectory_storage.waypoints.size())
         {
             goal_index++;
             ROS_INFO_STREAM("2nd if");
+        }
+        else if (goal_index == trajectory_storage.waypoints.size() && sqrt(pow(global_odom.pose.pose.position.x, 2) + pow(global_odom.pose.pose.position.y, 2)) < 0.3)
+        {
+            goal_index = trajectory_storage.waypoints.size();
+            timer = ros::Time::now().toSec() - timer;
+            ROS_INFO_STREAM("Timer stopped ---> " << timer);    
         }
         
     }
@@ -90,6 +103,8 @@ void astar_cb(const apf_la::GlobalTrajectory::ConstPtr& trajectory)
 
 void odom_cb(const nav_msgs::Odometry::ConstPtr& odom)
 {
+    global_odom = *odom;
+
 //DEBUG rinfo
 //****************************************************************************************************
 if(0)
@@ -109,7 +124,7 @@ if(0)
 //****************************************************************************************************
 
 // ROS_INFO_STREAM("\n#############################################################\n#############################################################\n########	odom coords:" <<	odom->pose.pose.position.x << " " << odom->pose.pose.position.y <<  " " << odom->pose.pose.position.z	<<	"\n########	goal coords:" << astar_point_stacker.actual_goal.pose.position.x << " "	<< astar_point_stacker.actual_goal.pose.position.y << " " << astar_point_stacker.actual_goal.pose.position.z	<<	"\n#############################################################\n#############################################################");
-ROS_INFO_STREAM("\n#############################################################\n#############################################################\n########	distance to goal:" << 	pow(odom->pose.pose.position.x - astar_point_stacker.actual_goal.pose.position.x, 2) + pow(odom->pose.pose.position.y - astar_point_stacker.actual_goal.pose.position.y, 2)	<< 		"\n########	threshold:" << 	pow(astar_point_stacker.goal_threshold, 2)	<< 		"\n#############################################################\n#############################################################");
+// ROS_INFO_STREAM("\n#############################################################\n#############################################################\n########	distance to goal:" << 	pow(odom->pose.pose.position.x - astar_point_stacker.actual_goal.pose.position.x, 2) + pow(odom->pose.pose.position.y - astar_point_stacker.actual_goal.pose.position.y, 2)	<< 		"\n########	threshold:" << 	pow(astar_point_stacker.goal_threshold, 2)	<< 		"\n#############################################################\n#############################################################");
 
     if(pow(odom->pose.pose.position.x - astar_point_stacker.actual_goal.pose.position.x, 2) + pow(odom->pose.pose.position.y - astar_point_stacker.actual_goal.pose.position.y, 2) < pow(astar_point_stacker.goal_threshold, 2))
     {

@@ -11,13 +11,17 @@
 ros::ServiceClient client;
 ros::Publisher trajectory_pub;
 ros::Publisher trajectory_vis_pub;
+nav_msgs::Odometry global_odom;
 
-
+bool goal_reached = 0;
+int goal_reached_counter = 0;
+bool trajectory_is_sent = 0;
+bool timer_set = 0;
 geometry_msgs::PoseStamped bufferized_goal;
 std::vector<nav_msgs::Odometry> bufferized_odometry;
 int stuck_counter = 0;
 int odom_stuck_counter = 0;
-
+double timer;
 
 void goal_cb(const geometry_msgs::PoseStamped::ConstPtr& goal)
 {
@@ -38,7 +42,11 @@ void goal_cb(const geometry_msgs::PoseStamped::ConstPtr& goal)
             trajectory.waypoints.push_back(srv.response.path.at(i));
         }
         trajectory_pub.publish(trajectory);
-        ROS_INFO_STREAM("Published trajectory with" << srv.response.path.size() << "waypoints\n");
+        trajectory_is_sent = 1;
+        goal_reached = 0;
+        goal_reached_counter = 0;
+
+        ROS_INFO_STREAM("Published trajectory with" << srv.response.path.size() << "waypoints\n and STARTED TIMER");
     }
     
     else
@@ -59,59 +67,105 @@ void vel_cb(const geometry_msgs::Twist::ConstPtr& velocity)
 
 void odom_cb (const nav_msgs::Odometry::ConstPtr& odom)
 {
-    for (int i = 1; i < bufferized_odometry.size(); i++)
-    {
-        bufferized_odometry.at(i-1) = bufferized_odometry.at(i);
-    }
-    bufferized_odometry.at(bufferized_odometry.size()-1) = *odom;
+    global_odom = *odom;
 
-    if( sqrt(pow(odom->twist.twist.linear.x, 2) + pow(odom->twist.twist.linear.y, 2)) < 0.01 && abs(odom->twist.twist.angular.z < 0.2) )
+    if (trajectory_is_sent == 1)
     {
-        stuck_counter++;
-    }
-
-    std::vector<geometry_msgs::Point> odom_delta;
-    odom_delta.resize(bufferized_odometry.size()-1);
-
-    for(int i = 1; i < bufferized_odometry.size() - 1; i++)
-    {
-        odom_delta.at(i).x = bufferized_odometry.at(i).pose.pose.position.x - bufferized_odometry.at(i-1).pose.pose.position.x;
-        odom_delta.at(i).y = bufferized_odometry.at(i).pose.pose.position.y - bufferized_odometry.at(i-1).pose.pose.position.y;
-    }
-
-    for (int i = 1; i < odom_delta.size() - 1; i++)
-    {
-        if (sqrt(pow(odom_delta.at(i).x, 2) + pow(odom_delta.at(i).y, 2)) - sqrt(pow(odom_delta.at(i-1).x, 2) + pow(odom_delta.at(i-1).y, 2)) > 0.2)
+        if (timer_set != 1 && abs(global_odom.twist.twist.linear.x) < 0.001 && abs(global_odom.twist.twist.linear.y) < 0.001)
         {
-            odom_stuck_counter++;
+            ROS_WARN_STREAM("Waiting for robot to start moving...");
+        }
+        else if (timer_set != 1)
+        {
+            timer = ros::Time::now().toSec();   
+            timer_set = 1;
         }
     }
 
-    if(stuck_counter >= 25 || odom_stuck_counter >= 1000)
+    // for (int i = 1; i < bufferized_odometry.size(); i++)
+    // {
+    //     bufferized_odometry.at(i-1) = bufferized_odometry.at(i);
+    // }
+    // bufferized_odometry.at(bufferized_odometry.size()-1) = *odom;
+    bufferized_odometry.push_back(*odom);
+    for (int i = 0; ros::Time::now().toSec() - bufferized_odometry.at(i).header.stamp.toSec() > 5; i++)
     {
-        apf_la::GetTrajectory srv;
-        srv.request.goal_position.pose.position.x = bufferized_goal.pose.position.x;
-        srv.request.goal_position.pose.position.y = bufferized_goal.pose.position.y;
-        ROS_ERROR_STREAM("Stuck! Resending goal...\n");
+        bufferized_odometry.erase(bufferized_odometry.begin());
+    }
 
-        if (client.call(srv))
+    if (bufferized_odometry.size() > 1)
+    {
+        if( sqrt(pow(odom->twist.twist.linear.x, 2) + pow(odom->twist.twist.linear.y, 2)) < 0.01 && abs(odom->twist.twist.angular.z < 0.2) )
         {
-            apf_la::GlobalTrajectory trajectory;
-            for(int i = 0; i < srv.response.path.size(); i++)
+            stuck_counter++;
+        }
+
+        std::vector<geometry_msgs::Point> odom_delta;
+        odom_delta.resize(1);
+
+        // for(int i = 1; i < bufferized_odometry.size() - 1; i++)
+        // {
+            odom_delta.at(0).x = bufferized_odometry.at(bufferized_odometry.size() - 1).pose.pose.position.x - bufferized_odometry.at(0).pose.pose.position.x;
+            odom_delta.at(0).y = bufferized_odometry.at(bufferized_odometry.size() - 1).pose.pose.position.y - bufferized_odometry.at(0).pose.pose.position.y;
+        // }
+
+            if (sqrt(pow(odom_delta.at(0).x, 2) + pow(odom_delta.at(0).y, 2)) < 0.5)
             {
-                trajectory.waypoints.push_back(srv.response.path.at(i));
+                odom_stuck_counter++;
             }
-            trajectory_pub.publish(trajectory);
-            ROS_INFO_STREAM("Published trajectory with" << srv.response.path.size() << "waypoints\n");
-            stuck_counter = 0;
-            odom_stuck_counter = 0;
-        }
 
-        else
+        if(stuck_counter >= 25 || odom_stuck_counter >= 1000)
         {
-            ROS_ERROR("Failed to call service.");
+            apf_la::GetTrajectory srv;
+            srv.request.goal_position.pose.position.x = bufferized_goal.pose.position.x;
+            srv.request.goal_position.pose.position.y = bufferized_goal.pose.position.y;
+            ROS_ERROR_STREAM("Stuck! Resending goal...\n");
+
+            if (client.call(srv))
+            {
+                apf_la::GlobalTrajectory trajectory;
+                for(int i = 0; i < srv.response.path.size(); i++)
+                {
+                    trajectory.waypoints.push_back(srv.response.path.at(i));
+                }
+                trajectory_pub.publish(trajectory);
+                ROS_INFO_STREAM("Published trajectory with" << srv.response.path.size() << "waypoints\n");
+                stuck_counter = 0;
+                odom_stuck_counter = 0;
+            }
+
+            else
+            {
+                ROS_ERROR("Failed to call service.");
+            }
         }
     }
+    
+    if(goal_reached != 1 && abs(sqrt(pow(global_odom.pose.pose.position.x, 2) + pow(global_odom.pose.pose.position.y, 2)) - sqrt(pow(bufferized_goal.pose.position.x, 2) + pow(bufferized_goal.pose.position.y, 2))) < 0.3)
+    {
+        goal_reached_counter++;
+    }
+
+    if(goal_reached_counter >= 100 && goal_reached != 1)
+    {
+        ROS_INFO_STREAM("Goal reached! \n");
+        timer = ros::Time::now().toSec() - timer;
+        ROS_WARN_STREAM("Time elapsed: " << timer << " seconds\n");
+        goal_reached = 1;
+        timer_set = 0;
+        stuck_counter = 0;
+        odom_stuck_counter = 0;
+        trajectory_is_sent = 0;
+    }
+
+    if(goal_reached != 1)
+    {
+        ROS_INFO_STREAM("time elapsed: " << ros::Time::now().toSec() - timer << "\n");
+    }
+    // {
+    //     ROS_INFO_STREAM("Goal reached! \n");
+    //     ROS_INFO_STREAM("Time elapsed: " << ros::Time::now().toSec() - timer << "s\n");
+    // }
 }
 
 
@@ -126,7 +180,7 @@ int main(int argc, char **argv)
     ros::Subscriber odom_sub = n.subscribe("/odom", 100, odom_cb);
     trajectory_pub = n.advertise<apf_la::GlobalTrajectory>("/astar/trajectory", 10);
 
-    bufferized_odometry.resize(10);
+    // bufferized_odometry.resize(10);
 
     ros::spin();
     return 0;
