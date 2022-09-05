@@ -10,6 +10,7 @@
   <node name="astar_server_node" pkg="apf_la" type="astar_planner_ros_server.py" output="log"/>
   <node name="astar_client_node" pkg="apf_la" type="astar_client" output="log"/>
   <node name="astar_point_stacker_node" pkg="apf_la" type="astar_point_stacker" output="screen"/>
+  <node name="trajectory_visualization_node" pkg="trajectory_visualisation_rviz" type="trajectory_visualizer" output="screen"/>
 </launch>
 
 
