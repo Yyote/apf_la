@@ -1,0 +1,31 @@
+!!python/object/new:dynamic_reconfigure.encoding.Config
+dictitems:
+  angular_d: 0.1
+  angular_p: 2.5
+  groups: !!python/object/new:dynamic_reconfigure.encoding.Config
+    dictitems:
+      angular_d: 0.1
+      angular_p: 2.5
+      groups: !!python/object/new:dynamic_reconfigure.encoding.Config
+        state: []
+      hor_kd: 0.65
+      hor_kp: 0.52
+      id: 0
+      max_hor_vel: 0.5
+      max_ver_vel: 2.0
+      name: Default
+      parameters: !!python/object/new:dynamic_reconfigure.encoding.Config
+        state: []
+      parent: 0
+      state: true
+      type: ''
+      ver_kd: 1.0e-06
+      ver_kp: 2.1
+    state: []
+  hor_kd: 0.65
+  hor_kp: 0.52
+  max_hor_vel: 0.5
+  max_ver_vel: 2.0
+  ver_kd: 1.0e-06
+  ver_kp: 2.1
+state: []
